@@ -12,6 +12,9 @@ export default function Photo() {
 
   const [data, setData] = useState<any>(null);
 
+  const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
+
+
 
 
 
@@ -70,14 +73,15 @@ export default function Photo() {
               font-bold
             "
           >
-
             No Photo Data Found
-
           </h1>
 
 
+
           <button
+
             onClick={()=>router.push("/events")}
+
             className="
               mt-5
               rounded-full
@@ -87,6 +91,7 @@ export default function Photo() {
               border
               border-white/20
             "
+
           >
 
             Return To Events
@@ -109,6 +114,29 @@ export default function Photo() {
 
 
 
+
+  const downloadPhotos = () => {
+
+
+    window.open(
+
+      `http://localhost:5000/api/download/${data.student.id}`,
+
+      "_blank"
+
+    );
+
+
+  };
+
+
+
+
+
+
+
+
+
   return (
 
     <main
@@ -117,6 +145,7 @@ export default function Photo() {
         p-8
       "
     >
+
 
 
 
@@ -168,23 +197,30 @@ export default function Photo() {
 
 
 
+
+
         {/* Student Detail */}
 
+
         <div
+
           className="
             glass
             rounded-3xl
             p-8
             text-center
           "
+
         >
 
 
           <h1
+
             className="
               text-4xl
               font-bold
             "
+
           >
 
             {data.student.name}
@@ -193,12 +229,16 @@ export default function Photo() {
 
 
 
+
+
           <div
+
             className="
               mt-5
               text-slate-300
               leading-8
             "
+
           >
 
             <p>
@@ -237,11 +277,14 @@ export default function Photo() {
 
         {/* Photos */}
 
+
         <PhotoCategory
 
           title="📸 Foto Bebas"
 
-          photos={data.photos.BEBAS}
+          photos={data.photos?.BEBAS}
+
+          onClick={setSelectedPhoto}
 
         />
 
@@ -251,7 +294,9 @@ export default function Photo() {
 
           title="🎓 Foto Kuncir"
 
-          photos={data.photos.KUNCIR}
+          photos={data.photos?.KUNCIR}
+
+          onClick={setSelectedPhoto}
 
         />
 
@@ -261,7 +306,9 @@ export default function Photo() {
 
           title="📜 Foto Ijazah"
 
-          photos={data.photos.IJAZAH}
+          photos={data.photos?.IJAZAH}
+
+          onClick={setSelectedPhoto}
 
         />
 
@@ -273,18 +320,30 @@ export default function Photo() {
 
 
 
-        {/* Download Button */}
+
+
+
+        {/* Download */}
+
 
         <div
+
           className="
             flex
             justify-center
             mt-12
             pb-10
           "
+
         >
 
+
           <button
+
+
+            onClick={downloadPhotos}
+
+
 
             className="
               rounded-full
@@ -298,11 +357,14 @@ export default function Photo() {
               transition
             "
 
+
           >
 
             DOWNLOAD ALL PHOTOS
 
+
           </button>
+
 
 
         </div>
@@ -312,6 +374,79 @@ export default function Photo() {
 
 
       </div>
+
+
+
+
+
+
+
+
+
+      {/* Preview Modal */}
+
+
+      {
+        selectedPhoto && (
+
+          <div
+
+            onClick={()=>setSelectedPhoto(null)}
+
+            className="
+              fixed
+              inset-0
+              z-50
+              bg-black/80
+              flex
+              items-center
+              justify-center
+              p-8
+            "
+
+          >
+
+
+            <img
+
+
+              onClick={(e)=>e.stopPropagation()}
+
+
+              src={
+
+                selectedPhoto.url.startsWith("http")
+
+                ?
+
+                selectedPhoto.url
+
+                :
+
+                `http://localhost:5000${selectedPhoto.url}`
+
+              }
+
+
+              alt="preview"
+
+
+              className="
+                max-h-[85vh]
+                max-w-5xl
+                rounded-3xl
+                object-contain
+              "
+
+
+            />
+
+
+          </div>
+
+
+        )
+      }
 
 
 
@@ -335,7 +470,10 @@ function PhotoCategory({
 
   title,
 
-  photos
+  photos,
+
+  onClick
+
 
 }:{
 
@@ -343,7 +481,12 @@ function PhotoCategory({
 
   photos:any[];
 
+  onClick:(photo:any)=>void;
+
 }){
+
+
+
 
 
   if(!photos || photos.length === 0){
@@ -355,24 +498,33 @@ function PhotoCategory({
 
 
 
+
+
+
+
   return (
 
     <section
+
       className="
         mt-12
       "
+
     >
 
 
 
       <h2
+
         className="
           text-3xl
           font-bold
         "
+
       >
 
         {title}
+
 
       </h2>
 
@@ -382,18 +534,23 @@ function PhotoCategory({
 
 
 
+
+
       <div
+
         className="
           grid
           md:grid-cols-3
           gap-6
           mt-6
         "
+
       >
 
 
 
         {
+
           photos.map((photo,index)=>(
 
 
@@ -401,11 +558,16 @@ function PhotoCategory({
 
               key={index}
 
+
+              onClick={()=>onClick(photo)}
+
+
               className="
                 glass
                 rounded-2xl
                 overflow-hidden
                 aspect-square
+                cursor-pointer
               "
 
             >
@@ -413,9 +575,24 @@ function PhotoCategory({
 
               <img
 
-                src={photo.url}
+
+                src={
+
+                  photo.url.startsWith("http")
+
+                  ?
+
+                  photo.url
+
+                  :
+
+                  `http://localhost:5000${photo.url}`
+
+                }
+
 
                 alt={photo.type}
+
 
                 className="
                   w-full
@@ -426,6 +603,7 @@ function PhotoCategory({
                   duration-500
                 "
 
+
               />
 
 
@@ -433,11 +611,13 @@ function PhotoCategory({
 
 
           ))
+
         }
 
 
 
       </div>
+
 
 
 
