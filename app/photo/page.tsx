@@ -58,6 +58,7 @@ export default function Photo(){
 
 
 
+
                 const response =
                 await fetch(
 
@@ -85,8 +86,6 @@ export default function Photo(){
 
 
 
-
-
                 const result =
                 await response.json();
 
@@ -99,9 +98,13 @@ export default function Photo(){
 
 
                     setError(
+
                         result.message ||
+
                         "Photo not found"
+
                     );
+
 
                     return;
 
@@ -120,7 +123,6 @@ export default function Photo(){
 
 
 
-
             }catch(error){
 
 
@@ -128,8 +130,11 @@ export default function Photo(){
 
 
                 setError(
+
                     "Cannot connect to server"
+
                 );
+
 
 
             }finally{
@@ -151,6 +156,77 @@ export default function Photo(){
 
 
     },[]);
+
+
+
+
+
+
+
+
+
+    const reportProblem = ()=>{
+
+
+        const subject =
+
+        encodeURIComponent(
+
+            `Report Photo - ${data.student.name}`
+
+        );
+
+
+
+
+
+        const body =
+
+        encodeURIComponent(
+
+`Hello Pandawa Creative Team,
+
+Saya ingin melaporkan masalah terkait foto wisuda.
+
+Detail Mahasiswa:
+
+Nama:
+${data.student.name}
+
+Nomor Wisuda:
+${data.student.graduation_number}
+
+Fakultas:
+${data.student.faculty}
+
+Program Studi:
+${data.student.study_program}
+
+
+Detail masalah:
+
+(Tuliskan masalah foto di sini)
+
+
+Terima kasih.
+
+`
+
+        );
+
+
+
+
+
+
+
+        window.location.href =
+
+        `mailto:contact@pandawacreative.com?subject=${subject}&body=${body}`;
+
+
+
+    };
 
 
 
@@ -215,17 +291,16 @@ export default function Photo(){
                     font-bold
                     ">
 
-                        {error}
+                    {error}
 
                     </h1>
 
 
 
+
                     <button
 
-                    onClick={()=>
-                        router.push("/events")
-                    }
+                    onClick={()=>router.push("/")}
 
                     className="
                     mt-5
@@ -237,7 +312,7 @@ export default function Photo(){
 
                     >
 
-                        Back
+                    Return Home
 
                     </button>
 
@@ -291,10 +366,9 @@ export default function Photo(){
 
             >
 
-                ← Back
+            ← Back
 
             </button>
-
 
 
 
@@ -307,6 +381,7 @@ export default function Photo(){
             <div className="
             max-w-6xl
             mx-auto
+            space-y-10
             ">
 
 
@@ -315,17 +390,77 @@ export default function Photo(){
 
 
 
+                {/* PHOTO CARD */}
 
-                {/* STUDENT CARD */}
+
+                <div className="
+                grid
+                md:grid-cols-3
+                gap-6
+                ">
+
+
+
+                    <PhotoCard
+
+                    title="📸 Foto Bebas"
+
+                    photo={
+                        data.photos.BEBAS?.[0]
+                    }
+
+                    />
+
+
+
+
+
+                    <PhotoCard
+
+                    title="🎓 Foto Kuncir"
+
+                    photo={
+                        data.photos.KUNCIR?.[0]
+                    }
+
+                    />
+
+
+
+
+
+                    <PhotoCard
+
+                    title="📜 Foto Ijazah"
+
+                    photo={
+                        data.photos.IJAZAH?.[0]
+                    }
+
+                    />
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+
+                {/* STUDENT DETAIL */}
 
 
                 <div className="
                 glass
                 rounded-3xl
-                p-8
+                p-10
                 text-center
-                shadow-xl
                 ">
+
 
 
                     <h1 className="
@@ -333,7 +468,7 @@ export default function Photo(){
                     font-bold
                     ">
 
-                        {data.student.name}
+                    {data.student.name}
 
                     </h1>
 
@@ -342,27 +477,17 @@ export default function Photo(){
 
 
                     <div className="
-                    mt-5
+                    mt-6
+                    space-y-3
                     text-slate-300
-                    space-y-2
                     ">
 
 
                         <p>
 
-                            Graduation Number:
-                            {" "}
-                            {data.student.graduation_number}
-
-                        </p>
-
-
-
-                        <p>
-
-                            Faculty:
-                            {" "}
-                            {data.student.faculty}
+                        Graduation Number:
+                        {" "}
+                        {data.student.graduation_number}
 
                         </p>
 
@@ -371,9 +496,21 @@ export default function Photo(){
 
                         <p>
 
-                            Program:
-                            {" "}
-                            {data.student.study_program}
+                        Faculty:
+                        {" "}
+                        {data.student.faculty}
+
+                        </p>
+
+
+
+
+
+                        <p>
+
+                        Program:
+                        {" "}
+                        {data.student.study_program}
 
                         </p>
 
@@ -392,68 +529,6 @@ export default function Photo(){
 
 
 
-
-
-
-                {/* PHOTO CARD */}
-
-
-
-                <PhotoCategory
-
-                title="📸 Foto Bebas"
-
-                subtitle="Foto bebas wisuda"
-
-                photos={
-                    data.photos.BEBAS
-                }
-
-                />
-
-
-
-
-
-
-                <PhotoCategory
-
-                title="🎓 Foto Kuncir"
-
-                subtitle="Foto prosesi kuncir"
-
-                photos={
-                    data.photos.KUNCIR
-                }
-
-                />
-
-
-
-
-
-
-
-                <PhotoCategory
-
-                title="📜 Foto Ijazah"
-
-                subtitle="Foto ijazah resmi"
-
-                photos={
-                    data.photos.IJAZAH
-                }
-
-                />
-
-
-
-
-
-
-
-
-
                 {/* BUTTON */}
 
 
@@ -461,9 +536,8 @@ export default function Photo(){
                 flex
                 justify-center
                 gap-5
-                mt-14
-                pb-10
                 flex-wrap
+                pb-10
                 ">
 
 
@@ -500,7 +574,7 @@ export default function Photo(){
 
                     >
 
-                        DOWNLOAD ALL PHOTOS
+                    DOWNLOAD ALL PHOTOS
 
                     </button>
 
@@ -510,15 +584,11 @@ export default function Photo(){
 
 
 
+
+
                     <button
 
-                    onClick={()=>{
-
-                        alert(
-                            "Report sent to administrator"
-                        );
-
-                    }}
+                    onClick={reportProblem}
 
                     className="
                     rounded-full
@@ -534,14 +604,48 @@ export default function Photo(){
 
                     >
 
-                        REPORT PROBLEM
+                    REPORT PROBLEM
 
                     </button>
 
 
 
 
+
+
+
+
+
+                    <button
+
+                    onClick={()=>router.push("/")}
+
+                    className="
+                    rounded-full
+                    bg-white/10
+                    border
+                    border-white/20
+                    px-8
+                    py-4
+                    text-white
+                    hover:bg-white/20
+                    transition
+                    "
+
+                    >
+
+                    RETURN TO HOME
+
+                    </button>
+
+
+
+
+
+
                 </div>
+
+
 
 
 
@@ -570,185 +674,100 @@ export default function Photo(){
 
 
 
-function PhotoCategory({
+function PhotoCard({
 
     title,
 
-    subtitle,
-
-    photos
+    photo
 
 
 }:{
 
     title:string;
 
-    subtitle:string;
-
-    photos:any[];
+    photo:any;
 
 }){
 
 
-
-
-
-
-
     return(
 
-        <section className="
-        mt-12
+
+        <div className="
+        glass
+        rounded-3xl
+        p-5
         ">
 
 
-
-
-
-            <div className="
-            glass
-            rounded-3xl
-            p-6
+            <h2 className="
+            text-xl
+            font-bold
+            text-center
+            mb-5
             ">
 
+            {title}
+
+            </h2>
 
 
-                <div className="mb-6">
 
 
-                    <h2 className="
-                    text-3xl
-                    font-bold
-                    ">
-
-                        {title}
-
-                    </h2>
 
 
-                    <p className="
-                    text-slate-400
-                    mt-2
-                    ">
 
-                        {subtitle}
+            {
 
-                    </p>
+                photo
 
+                ?
+
+                <img
+
+                src={
+
+                    `${process.env.NEXT_PUBLIC_API_URL}${photo.url}`
+
+                }
+
+                alt={title}
+
+                className="
+                w-full
+                aspect-square
+                object-cover
+                rounded-2xl
+                "
+
+                />
+
+                :
+
+
+                <div className="
+                aspect-square
+                rounded-2xl
+                bg-black/20
+                flex
+                items-center
+                justify-center
+                text-slate-400
+                ">
+
+                    No Photo
 
                 </div>
 
 
+            }
 
 
 
 
 
 
-
-                {
-
-                    !photos ||
-                    photos.length===0
-
-                    ?
-
-                    (
-
-                    <div className="
-                    rounded-2xl
-                    bg-black/20
-                    border
-                    border-white/10
-                    p-8
-                    text-center
-                    text-slate-400
-                    ">
-
-                        No photo available
-
-                    </div>
-
-                    )
-
-                    :
-
-                    (
-
-                    <div className="
-                    grid
-                    md:grid-cols-3
-                    gap-6
-                    ">
-
-
-                    {
-                        photos.map((photo,index)=>(
-
-
-                            <div
-
-                            key={index}
-
-                            className="
-                            rounded-2xl
-                            overflow-hidden
-                            bg-black/20
-                            border
-                            border-white/10
-                            aspect-square
-                            group
-                            "
-
-                            >
-
-
-                                <img
-
-                                src={
-
-                                    `${process.env.NEXT_PUBLIC_API_URL}${photo.url}`
-
-                                }
-
-                                alt="Graduation Photo"
-
-                                className="
-                                w-full
-                                h-full
-                                object-cover
-                                group-hover:scale-110
-                                transition
-                                duration-500
-                                "
-
-                                />
-
-
-
-                            </div>
-
-
-                        ))
-                    }
-
-
-                    </div>
-
-                    )
-
-
-                }
-
-
-
-            </div>
-
-
-
-
-
-        </section>
+        </div>
 
 
     );

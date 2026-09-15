@@ -1,145 +1,139 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+
+import {
+    useEffect,
+    useState
+} from "react";
 
 
-export default function Events() {
-
-  const router = useRouter();
-
-
-  const [events, setEvents] = useState<any[]>([]);
-
-  const [search, setSearch] = useState("");
-
-  const [loading, setLoading] = useState(true);
+import {
+    useRouter
+} from "next/navigation";
 
 
 
-  useEffect(() => {
 
 
-    const fetchEvents = async () => {
-
-      try {
-
-        const response = await fetch(
-          "http://localhost:5000/api/events"
-        );
+export default function EventsPage(){
 
 
-        const data = await response.json();
+    const router =
+    useRouter();
 
 
-        setEvents(data);
+
+    const [events,setEvents] =
+    useState<any[]>([]);
 
 
-      } catch (error) {
 
-        console.log(
-          "Failed fetch events:",
-          error
-        );
+    const [search,setSearch] =
+    useState("");
 
-      } finally {
 
-        setLoading(false);
 
-      }
+    const [loading,setLoading] =
+    useState(true);
+
+
+
+
+
+
+
+    useEffect(()=>{
+
+
+        loadEvents();
+
+
+    },[]);
+
+
+
+
+
+
+
+
+
+    const loadEvents = async()=>{
+
+
+        try{
+
+
+            const res =
+            await fetch(
+
+                `${process.env.NEXT_PUBLIC_API_URL}/api/events`
+
+            );
+
+
+
+            const data =
+            await res.json();
+
+
+
+
+            setEvents(
+
+                data.events || data
+
+            );
+
+
+
+
+        }catch(error){
+
+
+            console.error(error);
+
+
+        }finally{
+
+
+            setLoading(false);
+
+
+        }
+
 
     };
 
 
-    fetchEvents();
-
-
-  }, []);
 
 
 
 
 
-  const filteredEvents = events.filter((event) =>
-
-    `${event.name} ${event.title} ${event.date}`
-
-      .toLowerCase()
-
-      .includes(search.toLowerCase())
-
-  );
 
 
+    const openEvent = (event:any) => {
 
+    if(event.type === "PERSONAL"){
 
+        router.push(
+            `/search?event=${event.id}`
+        );
 
-  const handleEventClick = (event:any) => {
-
-
-    if(event.type === "special"){
-
-      router.push(
-        `/search?event=${event.id}`
-      );
-
+        return;
     }
 
-    else{
+    if(event.type === "GALLERY"){
 
-      router.push(
-        `/event/${event.id}`
-      );
+        router.push(
+            `/gallery/${event.slug}`
+        );
 
+        return;
     }
 
-
-  };
-
-
-
-
-
-  return (
-
-    <main
-      className="
-        min-h-screen
-        p-10
-        relative
-      "
-    >
-
-
-
-      {/* Back Button */}
-
-      <button
-
-        onClick={()=>router.back()}
-
-        className="
-          fixed
-          top-8
-          left-8
-          z-50
-          rounded-full
-          bg-white/10
-          border
-          border-white/20
-          backdrop-blur-xl
-          px-5
-          py-3
-          text-white
-          hover:bg-white/20
-          transition
-        "
-
-      >
-
-        ← Back
-
-      </button>
+};
 
 
 
@@ -147,99 +141,68 @@ export default function Events() {
 
 
 
-      {/* Header */}
-
-      <div className="text-center">
 
 
-        <h1
-          className="
-            text-5xl
-            font-bold
-          "
-        >
+    const filteredEvents =
 
-          Select Your Event
-
-        </h1>
+    events.filter((event)=>{
 
 
+        return (
 
-        <p
-          className="
-            mt-3
-            text-slate-400
-          "
-        >
+            event.name
 
-          Access photos, videos, and livestream recordings from your special moments
+            ?
 
-        </p>
+            event.name
+
+            .toLowerCase()
+
+            .includes(
+
+                search.toLowerCase()
+
+            )
+
+            :
+
+            false
+
+        );
 
 
-      </div>
-
-
+    });
 
 
 
 
 
-      {/* Search */}
-
-      <div
-        className="
-          max-w-xl
-          mx-auto
-          mt-10
-        "
-      >
 
 
-        <div
-          className="
+
+
+
+
+    if(loading){
+
+
+        return(
+
+            <main className="
+            min-h-screen
             flex
             items-center
-            rounded-2xl
-            bg-white/10
-            border
-            border-white/20
-            px-5
-            py-4
-            backdrop-blur-xl
-          "
-        >
+            justify-center
+            ">
+
+                Loading...
+
+            </main>
+
+        );
 
 
-          <span className="mr-3">
-            🔍
-          </span>
-
-
-
-          <input
-
-            value={search}
-
-            onChange={(e)=>setSearch(e.target.value)}
-
-            placeholder="Search event..."
-
-            className="
-              w-full
-              bg-transparent
-              outline-none
-              text-white
-              placeholder:text-slate-400
-            "
-
-          />
-
-
-        </div>
-
-
-      </div>
+    }
 
 
 
@@ -249,154 +212,179 @@ export default function Events() {
 
 
 
-      {/* Loading */}
+    return(
 
-      {
-        loading && (
 
-          <div
-            className="
-              text-center
-              mt-14
-              text-slate-400
-            "
-          >
-
-            Loading events...
-
-          </div>
-
-        )
-      }
+        <main className="
+        min-h-screen
+        p-8
+        ">
 
 
 
 
 
+            <div className="
+            max-w-5xl
+            mx-auto
+            ">
 
 
 
-      {/* Cards */}
-
-      {
-        !loading && (
-
-          <div
-            className="
-              grid
-              md:grid-cols-3
-              gap-8
-              max-w-6xl
-              mx-auto
-              mt-14
-            "
-          >
+                <h1 className="
+                text-6xl
+                font-bold
+                text-center
+                ">
 
 
-            {
-              filteredEvents.map((event)=>(
+                    Select Your Event
 
 
-                <div
-
-                  key={event.id}
-
-                  onClick={()=>handleEventClick(event)}
-
-                  className="
-                    glass
-                    rounded-3xl
-                    overflow-hidden
-                    cursor-pointer
-                    hover:-translate-y-3
-                    transition
-                    duration-300
-                    shadow-[0_20px_60px_rgba(0,0,0,.3)]
-                  "
-
-                >
+                </h1>
 
 
 
 
-                  {/* Thumbnail */}
 
-                  <div
+
+                <p className="
+                text-center
+                text-slate-400
+                mt-5
+                ">
+
+
+                    Access photos, videos, and livestream recordings from your special moments
+
+
+                </p>
+
+
+
+
+
+
+
+
+
+                <input
+
+
+                placeholder="Search event..."
+
+
+                value={search}
+
+
+                onChange={(e)=>
+                    setSearch(
+                        e.target.value
+                    )
+                }
+
+
+                className="
+                mt-12
+                w-full
+                p-5
+                rounded-3xl
+                bg-white/10
+                border
+                border-white/20
+                "
+
+
+                />
+
+
+
+
+
+
+
+
+
+
+
+
+                <div className="
+                grid
+                md:grid-cols-3
+                gap-8
+                mt-14
+                ">
+
+
+
+
+
+                {
+
+
+                filteredEvents.map((event)=>(
+
+
+
+                    <div
+
+
+                    key={event.id}
+
+
+                    onClick={()=>openEvent(event)}
+
 
                     className="
-                      h-52
-                      overflow-hidden
-                      bg-gradient-to-br
-                      from-slate-900
-                      to-blue-600
-                    "
+                    cursor-pointer
+                    rounded-3xl
+                    overflow-hidden
+                    bg-white/10
+                    border
+                    border-white/20
+                    hover:scale-105
+                    transition
+                    ">
 
-                  >
 
 
-                    <img
+                        <div className="
+                        h-56
+                        bg-blue-700
+                        ">
 
-                      src={event.thumbnail}
 
-                      alt={event.title}
+                        {
 
-                      className="
+
+                        event.thumbnail &&
+
+
+                        <img
+
+
+                        src={
+
+`${process.env.NEXT_PUBLIC_API_URL}${event.thumbnail}`
+
+                        }
+
+
+                        className="
                         w-full
                         h-full
                         object-cover
-                        hover:scale-110
-                        transition
-                        duration-500
-                      "
-
-                    />
+                        "
 
 
-                  </div>
+                        />
+
+
+                        }
 
 
 
-
-
-
-
-                  {/* Content */}
-
-                  <div className="p-7">
-
-
-
-                    <h2
-
-                      className="
-                        text-2xl
-                        font-bold
-                        leading-tight
-                      "
-
-                    >
-
-                      {event.name}
-
-                    </h2>
-
-
-
-
-
-                    <p
-
-                      className="
-                        mt-3
-                        text-lg
-                        text-slate-300
-                      "
-
-                    >
-
-                      {event.title}
-
-                    </p>
+                        </div>
 
 
 
@@ -404,110 +392,150 @@ export default function Events() {
 
 
 
-                    <div
 
-                      className="
-                        mt-4
-                        inline-flex
-                        rounded-full
-                        bg-blue-500/20
-                        px-4
-                        py-2
-                        text-sm
-                        text-blue-300
-                      "
 
-                    >
+                        <div className="
+                        p-6
+                        ">
 
-                      📅 {event.date}
+
+
+                            <h2 className="
+                            text-2xl
+                            font-bold
+                            ">
+
+
+                                {event.name}
+
+
+                            </h2>
+
+
+
+
+
+
+
+                            <p className="
+                            text-slate-300
+                            mt-3
+                            ">
+
+
+                                {event.title}
+
+
+                            </p>
+
+
+
+
+
+
+
+
+                            <div className="
+                            flex
+                            gap-3
+                            mt-5
+                            flex-wrap
+                            ">
+
+
+
+                                <span className="
+                                px-4
+                                py-2
+                                rounded-full
+                                bg-blue-500/20
+                                ">
+
+
+                                📅 {event.date}
+
+
+                                </span>
+
+
+
+
+
+
+
+
+                                <span className="
+                                px-4
+                                py-2
+                                rounded-full
+                                bg-white/10
+                                ">
+
+
+                                {
+
+
+                                event.type === "PERSONAL"
+
+                                ?
+
+                                "🎓 Personal Photo"
+
+                                :
+
+                                "📸 Gallery & Live"
+
+
+                                }
+
+
+                                </span>
+
+
+
+
+
+
+                            </div>
+
+
+
+
+
+                        </div>
+
+
+
+
+
 
                     </div>
 
 
 
+                ))
 
 
+                }
 
-
-                    {/* Type */}
-
-                    <div
-
-                      className="
-                        mt-3
-                        inline-flex
-                        rounded-full
-                        bg-white/10
-                        px-4
-                        py-2
-                        text-sm
-                        text-slate-200
-                      "
-
-                    >
-
-                      {
-                        event.type === "special"
-                        ?
-                        "🎓 Personal Photo"
-                        :
-                        "📸 Gallery & Live"
-                      }
-
-
-                    </div>
-
-
-
-                  </div>
 
 
 
                 </div>
 
 
-              ))
-
-            }
 
 
-          </div>
 
-        )
-      }
+            </div>
 
 
 
 
+        </main>
 
 
+    );
 
-      {
-        !loading &&
-        filteredEvents.length === 0 && (
-
-          <div
-
-            className="
-              text-center
-              mt-10
-              text-slate-400
-            "
-
-          >
-
-            Event tidak ditemukan 🔍
-
-          </div>
-
-        )
-      }
-
-
-
-
-    </main>
-
-  );
 
 }
