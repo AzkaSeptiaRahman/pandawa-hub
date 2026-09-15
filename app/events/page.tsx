@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const events = [
   {
@@ -22,9 +23,43 @@ const events = [
 
 export default function Events() {
   const router = useRouter();
+  const [search, setSearch] = useState("");
+
+  const filteredEvents = events.filter((event) =>
+    `${event.name} ${event.title} ${event.date}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
   return (
     <main className="min-h-screen p-10">
+
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="
+          fixed
+          top-8
+          left-8
+          z-50
+          flex
+          items-center
+          gap-2
+          rounded-full
+          bg-white/10
+          border
+          border-white/20
+          px-5
+          py-3
+          text-slate-200
+          backdrop-blur-xl
+          hover:bg-white/20
+          transition
+        "
+      >
+        ← Back
+      </button>
+
 
       {/* Header */}
       <h1 className="text-5xl font-bold text-center">
@@ -36,23 +71,69 @@ export default function Events() {
       </p>
 
 
-      {/* Event Cards */}
-      <div className="
-        grid 
-        md:grid-cols-3 
-        gap-8 
-        max-w-6xl 
-        mx-auto 
-        mt-14
-      ">
+      {/* Search Bar */}
+      <div className="max-w-xl mx-auto mt-10">
 
-        {events.map((event, i) => (
+        <div
+          className="
+            flex
+            items-center
+            rounded-2xl
+            bg-white/10
+            border
+            border-white/20
+            backdrop-blur-xl
+            px-5
+            py-4
+            shadow-lg
+          "
+        >
+
+          <span className="text-xl mr-3">
+            🔍
+          </span>
+
+
+          <input
+            type="text"
+            placeholder="Search event..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="
+              w-full
+              bg-transparent
+              outline-none
+              text-white
+              placeholder:text-slate-400
+            "
+          />
+
+        </div>
+
+      </div>
+
+
+
+      {/* Event Cards */}
+      <div
+        className="
+          grid
+          md:grid-cols-3
+          gap-8
+          max-w-6xl
+          mx-auto
+          mt-14
+        "
+      >
+
+        {filteredEvents.map((event, i) => (
+
           <div
             key={i}
             onClick={() => router.push("/search")}
             className="
-              glass 
-              rounded-3xl 
+              glass
+              rounded-3xl
               overflow-hidden
               cursor-pointer
               hover:-translate-y-3
@@ -62,7 +143,8 @@ export default function Events() {
             "
           >
 
-            {/* Image / Icon Area */}
+
+            {/* Icon Area */}
             <div
               className="
                 h-52
@@ -80,25 +162,33 @@ export default function Events() {
             </div>
 
 
+
             {/* Content */}
             <div className="p-7">
 
-              <h2 className="
-                text-2xl 
-                font-bold
-                leading-tight
-              ">
+
+              <h2
+                className="
+                  text-2xl
+                  font-bold
+                  leading-tight
+                "
+              >
                 {event.name}
               </h2>
 
 
-              <p className="
-                text-slate-300
-                mt-3
-                text-lg
-              ">
+
+              <p
+                className="
+                  text-slate-300
+                  mt-3
+                  text-lg
+                "
+              >
                 {event.title}
               </p>
+
 
 
               <div
@@ -117,12 +207,34 @@ export default function Events() {
                 📅 {event.date}
               </div>
 
+
             </div>
 
+
           </div>
+
         ))}
 
       </div>
+
+
+
+      {/* No Result */}
+      {filteredEvents.length === 0 && (
+
+        <div
+          className="
+            text-center
+            text-slate-400
+            mt-14
+            text-lg
+          "
+        >
+          Event tidak ditemukan 🔍
+        </div>
+
+      )}
+
 
     </main>
   );
