@@ -9,8 +9,8 @@ const events = [
     date: "5-6 & 12-13 September 2026",
   },
   {
-    name: "University XYZ",
-    title: "Graduation Ceremony",
+    name: "UIN Syarif Hidayatullah Jakarta",
+    title: "Wisuda ke-140",
     date: "2026",
   },
   {
