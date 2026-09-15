@@ -1,21 +1,43 @@
-{"timestamp":"00:00:14.685","source":"Server","level":"LOG","message":""}
-{"timestamp":"00:00:56.050","source":"Server","level":"LOG","message":"○ Compiling / ..."}
-{"timestamp":"00:01:09.707","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"00:01:10.011","source":"Browser","level":"WARN","message":"Image with src \"/Pandawa_Logo_Short_W.png\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \"auto\"' or 'height: \"auto\"' to maintain the aspect ratio."}
-{"timestamp":"00:01:10.053","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"/Pandawa_Logo_Short_W.png\\\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \\\"auto\\\"' or 'height: \\\"auto\\\"' to maintain the aspect ratio.\\u001b[39m\""}
-{"timestamp":"00:02:03.208","source":"Server","level":"LOG","message":"✓ Compiled in 146ms"}
-{"timestamp":"00:02:06.691","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"00:03:02.773","source":"Server","level":"LOG","message":"✓ Compiled in 258ms"}
-{"timestamp":"00:03:07.331","source":"Browser","level":"WARN","message":"Image with src \"/Pandawa_Logo_Short_W.png\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \"auto\"' or 'height: \"auto\"' to maintain the aspect ratio."}
-{"timestamp":"00:03:07.333","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"/Pandawa_Logo_Short_W.png\\\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \\\"auto\\\"' or 'height: \\\"auto\\\"' to maintain the aspect ratio.\\u001b[39m\""}
-{"timestamp":"00:05:11.502","source":"Server","level":"LOG","message":"✓ Compiled in 195ms"}
-{"timestamp":"00:05:21.653","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"00:06:05.076","source":"Server","level":"LOG","message":"✓ Compiled in 118ms"}
-{"timestamp":"00:07:15.774","source":"Server","level":"LOG","message":"✓ Compiled in 131ms"}
-{"timestamp":"00:09:21.839","source":"Server","level":"LOG","message":"✓ Compiled in 138ms"}
-{"timestamp":"00:10:23.260","source":"Server","level":"LOG","message":"✓ Compiled in 119ms"}
-{"timestamp":"00:10:32.838","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"00:10:34.686","source":"Browser","level":"WARN","message":"Image with src \"/Pandawa_Logo_Short_W.png\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \"auto\"' or 'height: \"auto\"' to maintain the aspect ratio."}
-{"timestamp":"00:10:34.689","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"/Pandawa_Logo_Short_W.png\\\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \\\"auto\\\"' or 'height: \\\"auto\\\"' to maintain the aspect ratio.\\u001b[39m\""}
-{"timestamp":"00:12:30.762","source":"Server","level":"LOG","message":"✓ Compiled in 184ms"}
-{"timestamp":"00:12:32.147","source":"Server","level":"LOG","message":"✓ Compiled in 53ms"}
+{"timestamp":"00:00:11.135","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:30.856","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:31.116","source":"Browser","level":"WARN","message":"Image with src \"/Pandawa_Logo_Short_W.png\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \"auto\"' or 'height: \"auto\"' to maintain the aspect ratio."}
+{"timestamp":"00:00:31.131","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"/Pandawa_Logo_Short_W.png\\\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \\\"auto\\\"' or 'height: \\\"auto\\\"' to maintain the aspect ratio.\\u001b[39m\""}
+{"timestamp":"00:00:38.149","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:40.404","source":"Browser","level":"WARN","message":"Image with src \"/Pandawa_Logo_Short_W.png\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \"auto\"' or 'height: \"auto\"' to maintain the aspect ratio."}
+{"timestamp":"00:00:40.406","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"/Pandawa_Logo_Short_W.png\\\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \\\"auto\\\"' or 'height: \\\"auto\\\"' to maintain the aspect ratio.\\u001b[39m\""}
+{"timestamp":"00:01:31.678","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:01:34.002","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:01:35.854","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:05:15.150","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:15.172","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:18.192","source":"Server","level":"LOG","message":"○ Compiling /_error ..."}
+{"timestamp":"00:05:19.348","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:19.350","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:19.479","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:19.483","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:19.636","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:19.651","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:19.738","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:19.742","source":"Server","level":"ERROR","message":"⨯ Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:21.164","source":"Browser","level":"ERROR","message":"Uncaught Error: The default export is not a React Component in \"/event/[id]/page\""}
+{"timestamp":"00:05:21.165","source":"Server","level":"ERROR","message":"[browser] \"\\u001b[31mUncaught Error: The default export is not a React Component in \\\"/event/[id]/page\\\"\\u001b[39m\""}
+{"timestamp":"00:05:39.557","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:05:54.469","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:09:39.177","source":"Server","level":"LOG","message":"✓ Compiled in 329ms"}
+{"timestamp":"00:09:42.205","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:10:35.108","source":"Browser","level":"WARN","message":"Image with src \"/Pandawa_Logo_Short_W.png\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \"auto\"' or 'height: \"auto\"' to maintain the aspect ratio."}
+{"timestamp":"00:10:35.317","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"/Pandawa_Logo_Short_W.png\\\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \\\"auto\\\"' or 'height: \\\"auto\\\"' to maintain the aspect ratio.\\u001b[39m\""}
+{"timestamp":"00:11:57.802","source":"Server","level":"LOG","message":"✓ Compiled in 196ms"}
+{"timestamp":"00:12:09.491","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:15:03.416","source":"Server","level":"LOG","message":"✓ Compiled in 698ms"}
+{"timestamp":"00:15:59.553","source":"Browser","level":"WARN","message":"Image with src \"/Pandawa_Logo_Short_W.png\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \"auto\"' or 'height: \"auto\"' to maintain the aspect ratio."}
+{"timestamp":"00:15:59.556","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"/Pandawa_Logo_Short_W.png\\\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \\\"auto\\\"' or 'height: \\\"auto\\\"' to maintain the aspect ratio.\\u001b[39m\""}
+{"timestamp":"00:17:40.729","source":"Browser","level":"ERROR","message":"./app/layout.tsx:20:1\nError: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n  18 |     <body>{children}</body>av\n  19 |  )\n> 20 | }\n     | ^\n\nParsing ecmascript source code failed "}
+{"timestamp":"00:17:40.731","source":"Server","level":"ERROR","message":"[browser] \"./app/layout.tsx:20:1\\nError: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\\n  18 |     <body>{children}</body>av\\n  19 |  )\\n> 20 | }\\n     | ^\\n\\nParsing ecmascript source code failed\" \"\""}
+{"timestamp":"00:17:40.808","source":"Browser","level":"ERROR","message":"./app/layout.tsx:20:1\nError: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n  18 |     <body>{children}</body>av\n  19 |  )\n> 20 | }\n     | ^\n\nParsing ecmascript source code failed "}
+{"timestamp":"00:17:40.809","source":"Server","level":"ERROR","message":"[browser] \"./app/layout.tsx:20:1\\nError: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\\n  18 |     <body>{children}</body>av\\n  19 |  )\\n> 20 | }\\n     | ^\\n\\nParsing ecmascript source code failed\" \"\""}
+{"timestamp":"00:17:42.503","source":"Server","level":"LOG","message":"✓ Compiled in 1158ms"}
+{"timestamp":"00:18:56.549","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:18:56.883","source":"Browser","level":"WARN","message":"Image with src \"/Pandawa_Logo_Short_W.png\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \"auto\"' or 'height: \"auto\"' to maintain the aspect ratio."}
+{"timestamp":"00:18:56.884","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"/Pandawa_Logo_Short_W.png\\\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \\\"auto\\\"' or 'height: \\\"auto\\\"' to maintain the aspect ratio.\\u001b[39m\""}
+{"timestamp":"00:21:10.781","source":"Server","level":"LOG","message":"✓ Compiled in 602ms"}

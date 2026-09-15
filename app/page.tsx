@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import Glow from "@/components/Glow";
 import Button from "@/components/Button";
-import Footer from "@/components/Footer";
+// import Footer from "@/components/Footer";
 
 export default function Home() {
   const router = useRouter();
@@ -55,8 +55,8 @@ export default function Home() {
         </div>
       </main>
 
-      {/* FOOTER */}
-      <Footer />
+      {/* FOOTER
+      <Footer /> */}
 
     </div>
   );

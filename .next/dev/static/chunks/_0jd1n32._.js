@@ -19,10 +19,27 @@ var _s = __turbopack_context__.k.signature();
 function Search() {
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    const [graduationNumber, setGraduationNumber] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [facultyOpen, setFacultyOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [studyOpen, setStudyOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [faculty, setFaculty] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("Select Faculty");
     const [study, setStudy] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("Select Study Program");
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const handleSearch = ()=>{
+        // Required field validation
+        if (!graduationNumber || faculty === "Select Faculty" || study === "Select Study Program") {
+            setError("Please complete all required fields");
+            return;
+        }
+        // Graduation number validation (4 digit)
+        const graduationRegex = /^\d{4}$/;
+        if (!graduationRegex.test(graduationNumber)) {
+            setError("Graduation number must be 4 digits");
+            return;
+        }
+        setError("");
+        router.push("/photo");
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
         className: "\n        min-h-screen\n        flex\n        items-center\n        justify-center\n        p-8\n        relative\n      ",
         children: [
@@ -32,7 +49,7 @@ function Search() {
                 children: "← Back"
             }, void 0, false, {
                 fileName: "[project]/app/search/page.tsx",
-                lineNumber: 30,
+                lineNumber: 80,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -46,7 +63,7 @@ function Search() {
                                 children: "Find Your Photo"
                             }, void 0, false, {
                                 fileName: "[project]/app/search/page.tsx",
-                                lineNumber: 73,
+                                lineNumber: 132,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -54,13 +71,13 @@ function Search() {
                                 children: "Enter your graduation information to find your photos"
                             }, void 0, false, {
                                 fileName: "[project]/app/search/page.tsx",
-                                lineNumber: 83,
+                                lineNumber: 142,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/search/page.tsx",
-                        lineNumber: 71,
+                        lineNumber: 129,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -68,11 +85,19 @@ function Search() {
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                 type: "text",
-                                placeholder: "Graduation Number",
+                                value: graduationNumber,
+                                maxLength: 4,
+                                onChange: (e)=>{
+                                    const value = e.target.value;
+                                    if (/^\d*$/.test(value)) {
+                                        setGraduationNumber(value);
+                                    }
+                                },
+                                placeholder: "Example: 0001",
                                 className: "\n              w-full\n              p-4\n              rounded-xl\n              bg-black/30\n              border\n              border-white/20\n              outline-none\n              text-white\n              placeholder:text-slate-400\n              focus:border-blue-400\n              transition\n            "
                             }, void 0, false, {
                                 fileName: "[project]/app/search/page.tsx",
-                                lineNumber: 101,
+                                lineNumber: 170,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -81,7 +106,7 @@ function Search() {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
                                         onClick: ()=>setFacultyOpen(!facultyOpen),
-                                        className: "\n                w-full\n                p-4\n                rounded-xl\n                bg-black/30\n                border\n                border-white/20\n                text-white\n                flex\n                justify-between\n                items-center\n                focus:border-blue-400\n                transition\n              ",
+                                        className: "\n                w-full\n                p-4\n                rounded-xl\n                bg-black/30\n                border\n                border-white/20\n                text-white\n                flex\n                justify-between\n                items-center\n                transition\n              ",
                                         children: [
                                             faculty,
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -89,42 +114,42 @@ function Search() {
                                                 children: "▼"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/search/page.tsx",
-                                                lineNumber: 145,
+                                                lineNumber: 245,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/search/page.tsx",
-                                        lineNumber: 124,
+                                        lineNumber: 220,
                                         columnNumber: 13
                                     }, this),
                                     facultyOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "\n                  absolute\n                  z-50\n                  mt-2\n                  w-full\n                  rounded-xl\n                  overflow-hidden\n                  bg-white\n                  shadow-xl\n                  border\n                  border-slate-200\n                ",
+                                        className: "\n                    absolute\n                    z-50\n                    mt-2\n                    w-full\n                    rounded-xl\n                    overflow-hidden\n                    bg-white\n                    shadow-xl\n                  ",
                                         children: [
-                                            "Faculty of Science",
-                                            "Faculty of Engineering",
-                                            "Faculty of Economics"
+                                            "Computer Science",
+                                            "Engineering",
+                                            "Economics"
                                         ].map((item)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 onClick: ()=>{
                                                     setFaculty(item);
                                                     setFacultyOpen(false);
                                                 },
-                                                className: "\n                      px-5\n                      py-3\n                      text-black\n                      cursor-pointer\n                      hover:bg-blue-100\n                      transition\n                    ",
+                                                className: "\n                          px-5\n                          py-3\n                          text-black\n                          cursor-pointer\n                          hover:bg-blue-100\n                          transition\n                        ",
                                                 children: item
                                             }, item, false, {
                                                 fileName: "[project]/app/search/page.tsx",
-                                                lineNumber: 176,
-                                                columnNumber: 19
+                                                lineNumber: 279,
+                                                columnNumber: 23
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/app/search/page.tsx",
-                                        lineNumber: 155,
-                                        columnNumber: 15
+                                        lineNumber: 259,
+                                        columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/search/page.tsx",
-                                lineNumber: 122,
+                                lineNumber: 217,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -133,7 +158,7 @@ function Search() {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
                                         onClick: ()=>setStudyOpen(!studyOpen),
-                                        className: "\n                w-full\n                p-4\n                rounded-xl\n                bg-black/30\n                border\n                border-white/20\n                text-white\n                flex\n                justify-between\n                items-center\n                focus:border-blue-400\n                transition\n              ",
+                                        className: "\n                w-full\n                p-4\n                rounded-xl\n                bg-black/30\n                border\n                border-white/20\n                text-white\n                flex\n                justify-between\n                items-center\n                transition\n              ",
                                         children: [
                                             study,
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -141,79 +166,90 @@ function Search() {
                                                 children: "▼"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/search/page.tsx",
-                                                lineNumber: 229,
+                                                lineNumber: 356,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/search/page.tsx",
-                                        lineNumber: 208,
+                                        lineNumber: 331,
                                         columnNumber: 13
                                     }, this),
                                     studyOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "\n                  absolute\n                  z-50\n                  mt-2\n                  w-full\n                  rounded-xl\n                  overflow-hidden\n                  bg-white\n                  shadow-xl\n                  border\n                  border-slate-200\n                ",
+                                        className: "\n                    absolute\n                    z-50\n                    mt-2\n                    w-full\n                    rounded-xl\n                    overflow-hidden\n                    bg-white\n                    shadow-xl\n                  ",
                                         children: [
+                                            "Information Technology",
                                             "Computer Science",
-                                            "Information System",
-                                            "Management"
+                                            "Information System"
                                         ].map((item)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 onClick: ()=>{
                                                     setStudy(item);
                                                     setStudyOpen(false);
                                                 },
-                                                className: "\n                      px-5\n                      py-3\n                      text-black\n                      cursor-pointer\n                      hover:bg-blue-100\n                      transition\n                    ",
+                                                className: "\n                          px-5\n                          py-3\n                          text-black\n                          cursor-pointer\n                          hover:bg-blue-100\n                          transition\n                        ",
                                                 children: item
                                             }, item, false, {
                                                 fileName: "[project]/app/search/page.tsx",
-                                                lineNumber: 260,
-                                                columnNumber: 19
+                                                lineNumber: 390,
+                                                columnNumber: 23
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/app/search/page.tsx",
-                                        lineNumber: 239,
-                                        columnNumber: 15
+                                        lineNumber: 370,
+                                        columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/search/page.tsx",
-                                lineNumber: 206,
+                                lineNumber: 328,
                                 columnNumber: 11
                             }, this),
+                            error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "\n                  rounded-xl\n                  bg-red-500/20\n                  border\n                  border-red-400/30\n                  px-4\n                  py-3\n                  text-red-300\n                  text-sm\n                  text-center\n                ",
+                                children: [
+                                    "⚠️ ",
+                                    error
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/search/page.tsx",
+                                lineNumber: 441,
+                                columnNumber: 15
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex justify-center pt-4",
+                                className: "\n              flex\n              justify-center\n              pt-4\n            ",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                    onClick: ()=>router.push("/photo"),
+                                    onClick: handleSearch,
                                     children: "SEARCH PHOTO"
                                 }, void 0, false, {
                                     fileName: "[project]/app/search/page.tsx",
-                                    lineNumber: 292,
+                                    lineNumber: 479,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/search/page.tsx",
-                                lineNumber: 290,
+                                lineNumber: 471,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/search/page.tsx",
-                        lineNumber: 97,
+                        lineNumber: 162,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/search/page.tsx",
-                lineNumber: 58,
+                lineNumber: 112,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/search/page.tsx",
-        lineNumber: 18,
+        lineNumber: 66,
         columnNumber: 5
     }, this);
 }
-_s(Search, "qzJylRchsuf2h8kwQtUFurHu8fs=", false, function() {
+_s(Search, "q+Y4+TJykdVBd3FL5HaKyypw/Lc=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];

@@ -5,7 +5,11 @@ import { useState } from "react";
 import Button from "@/components/Button";
 
 export default function Search() {
+
   const router = useRouter();
+
+
+  const [graduationNumber, setGraduationNumber] = useState("");
 
   const [facultyOpen, setFacultyOpen] = useState(false);
   const [studyOpen, setStudyOpen] = useState(false);
@@ -13,8 +17,52 @@ export default function Search() {
   const [faculty, setFaculty] = useState("Select Faculty");
   const [study, setStudy] = useState("Select Study Program");
 
+  const [error, setError] = useState("");
+
+
+
+  const handleSearch = () => {
+
+
+    // Required field validation
+    if (
+      !graduationNumber ||
+      faculty === "Select Faculty" ||
+      study === "Select Study Program"
+    ) {
+
+      setError("Please complete all required fields");
+
+      return;
+
+    }
+
+
+
+    // Graduation number validation (4 digit)
+    const graduationRegex = /^\d{4}$/;
+
+
+    if (!graduationRegex.test(graduationNumber)) {
+
+      setError("Graduation number must be 4 digits");
+
+      return;
+
+    }
+
+
+
+    setError("");
+
+    router.push("/photo");
+
+  };
+
+
 
   return (
+
     <main
       className="
         min-h-screen
@@ -25,6 +73,8 @@ export default function Search() {
         relative
       "
     >
+
+
 
       {/* Back Button */}
       <button
@@ -54,7 +104,11 @@ export default function Search() {
 
 
 
+
+
+
       {/* Card */}
+
       <div
         className="
           glass
@@ -67,8 +121,13 @@ export default function Search() {
       >
 
 
+
+
+
         {/* Header */}
+
         <div className="text-center">
+
 
           <h1
             className="
@@ -89,18 +148,48 @@ export default function Search() {
             Enter your graduation information to find your photos
           </p>
 
+
         </div>
 
 
 
+
+
+
+
         {/* Form */}
+
         <div className="mt-8 space-y-5">
 
 
+
+
+
           {/* Graduation Number */}
+
           <input
+
             type="text"
-            placeholder="Graduation Number"
+
+            value={graduationNumber}
+
+            maxLength={4}
+
+            onChange={(e) => {
+
+              const value = e.target.value;
+
+
+              if (/^\d*$/.test(value)) {
+
+                setGraduationNumber(value);
+
+              }
+
+            }}
+
+            placeholder="Example: 0001"
+
             className="
               w-full
               p-4
@@ -114,16 +203,26 @@ export default function Search() {
               focus:border-blue-400
               transition
             "
+
           />
 
 
 
+
+
+
+
           {/* Faculty Dropdown */}
+
           <div className="relative">
 
+
             <button
+
               type="button"
+
               onClick={() => setFacultyOpen(!facultyOpen)}
+
               className="
                 w-full
                 p-4
@@ -135,79 +234,106 @@ export default function Search() {
                 flex
                 justify-between
                 items-center
-                focus:border-blue-400
                 transition
               "
+
             >
 
               {faculty}
+
 
               <span className="text-slate-300 text-sm">
                 ▼
               </span>
 
+
             </button>
 
 
 
-            {facultyOpen && (
 
-              <div
-                className="
-                  absolute
-                  z-50
-                  mt-2
-                  w-full
-                  rounded-xl
-                  overflow-hidden
-                  bg-white
-                  shadow-xl
-                  border
-                  border-slate-200
-                "
-              >
 
-                {[
-                  "Faculty of Science",
-                  "Faculty of Engineering",
-                  "Faculty of Economics",
-                ].map((item) => (
+            {
+              facultyOpen && (
 
-                  <div
-                    key={item}
-                    onClick={() => {
-                      setFaculty(item);
-                      setFacultyOpen(false);
-                    }}
-                    className="
-                      px-5
-                      py-3
-                      text-black
-                      cursor-pointer
-                      hover:bg-blue-100
-                      transition
-                    "
-                  >
-                    {item}
-                  </div>
+                <div
+                  className="
+                    absolute
+                    z-50
+                    mt-2
+                    w-full
+                    rounded-xl
+                    overflow-hidden
+                    bg-white
+                    shadow-xl
+                  "
+                >
 
-                ))}
+                  {
+                    [
+                      "Computer Science",
+                      "Engineering",
+                      "Economics"
+                    ].map((item)=>(
 
-              </div>
+                      <div
 
-            )}
+                        key={item}
+
+                        onClick={() => {
+
+                          setFaculty(item);
+
+                          setFacultyOpen(false);
+
+                        }}
+
+                        className="
+                          px-5
+                          py-3
+                          text-black
+                          cursor-pointer
+                          hover:bg-blue-100
+                          transition
+                        "
+
+                      >
+
+                        {item}
+
+                      </div>
+
+
+                    ))
+                  }
+
+                </div>
+
+              )
+            }
+
 
           </div>
+
+
+
+
+
 
 
 
 
           {/* Study Program Dropdown */}
+
           <div className="relative">
 
+
             <button
+
               type="button"
+
               onClick={() => setStudyOpen(!studyOpen)}
+
               className="
                 w-full
                 p-4
@@ -219,83 +345,147 @@ export default function Search() {
                 flex
                 justify-between
                 items-center
-                focus:border-blue-400
                 transition
               "
+
             >
 
               {study}
+
 
               <span className="text-slate-300 text-sm">
                 ▼
               </span>
 
+
             </button>
 
 
 
-            {studyOpen && (
 
-              <div
-                className="
-                  absolute
-                  z-50
-                  mt-2
-                  w-full
-                  rounded-xl
-                  overflow-hidden
-                  bg-white
-                  shadow-xl
-                  border
-                  border-slate-200
-                "
-              >
 
-                {[
-                  "Computer Science",
-                  "Information System",
-                  "Management",
-                ].map((item) => (
+            {
+              studyOpen && (
 
-                  <div
-                    key={item}
-                    onClick={() => {
-                      setStudy(item);
-                      setStudyOpen(false);
-                    }}
-                    className="
-                      px-5
-                      py-3
-                      text-black
-                      cursor-pointer
-                      hover:bg-blue-100
-                      transition
-                    "
-                  >
-                    {item}
-                  </div>
+                <div
+                  className="
+                    absolute
+                    z-50
+                    mt-2
+                    w-full
+                    rounded-xl
+                    overflow-hidden
+                    bg-white
+                    shadow-xl
+                  "
+                >
 
-                ))}
+                  {
+                    [
+                      "Information Technology",
+                      "Computer Science",
+                      "Information System"
+                    ].map((item)=>(
 
-              </div>
+                      <div
 
-            )}
+                        key={item}
+
+                        onClick={() => {
+
+                          setStudy(item);
+
+                          setStudyOpen(false);
+
+                        }}
+
+                        className="
+                          px-5
+                          py-3
+                          text-black
+                          cursor-pointer
+                          hover:bg-blue-100
+                          transition
+                        "
+
+                      >
+
+                        {item}
+
+                      </div>
+
+
+                    ))
+                  }
+
+                </div>
+
+              )
+            }
+
 
           </div>
 
 
 
 
-          {/* Button */}
-          <div className="flex justify-center pt-4">
+
+
+
+
+          {/* Error Message */}
+
+          {
+            error && (
+
+              <div
+                className="
+                  rounded-xl
+                  bg-red-500/20
+                  border
+                  border-red-400/30
+                  px-4
+                  py-3
+                  text-red-300
+                  text-sm
+                  text-center
+                "
+              >
+
+                ⚠️ {error}
+
+              </div>
+
+            )
+          }
+
+
+
+
+
+
+
+
+          {/* Search Button */}
+
+          <div
+            className="
+              flex
+              justify-center
+              pt-4
+            "
+          >
 
             <Button
-              onClick={() => router.push("/photo")}
+              onClick={handleSearch}
             >
               SEARCH PHOTO
             </Button>
 
+
           </div>
+
+
 
 
         </div>
@@ -304,6 +494,8 @@ export default function Search() {
       </div>
 
 
+
     </main>
+
   );
 }
