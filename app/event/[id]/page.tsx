@@ -1,49 +1,211 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
-
-const eventData = {
-  id: 2,
-
-  name: "UIN Syarif Hidayatullah Jakarta",
-
-  title: "Dies Natalis 2026",
-
-  date: "20 October 2026",
-
-  thumbnail: "/images/diesnatalis.jpg",
-
-
-  gallery: [
-    "/images/event1.jpg",
-    "/images/event2.jpg",
-    "/images/event3.jpg",
-    "/images/event4.jpg",
-    "/images/event5.jpg",
-    "/images/event6.jpg",
-  ],
-
-
-  highlights: [
-    {
-      title: "Live Streaming Dies Natalis 2026",
-      url: "https://youtube.com/live/example",
-    },
-
-    {
-      title: "After Movie Dies Natalis 2026",
-      url: "https://youtube.com/watch/example",
-    },
-  ],
-
-};
-
+import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 
 export default function EventDetail() {
 
+
   const router = useRouter();
+
+  const params = useParams();
+
+
+  const [event, setEvent] = useState<any>(null);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
+
+
+
+
+  useEffect(() => {
+
+
+    const fetchEvent = async () => {
+
+
+      try {
+
+
+        const response = await fetch(
+          `http://localhost:5000/api/events/${params.id}`
+        );
+
+
+
+        if(!response.ok){
+
+          throw new Error(
+            "Event not found"
+          );
+
+        }
+
+
+
+        const data = await response.json();
+
+
+
+        setEvent(data);
+
+
+
+      } catch(err:any){
+
+
+        setError(err.message);
+
+
+
+      } finally {
+
+
+        setLoading(false);
+
+
+      }
+
+
+    };
+
+
+
+    if(params.id){
+
+      fetchEvent();
+
+    }
+
+
+
+  }, [params.id]);
+
+
+
+
+
+
+
+
+
+  if(loading){
+
+
+    return (
+
+      <main
+        className="
+          min-h-screen
+          flex
+          items-center
+          justify-center
+        "
+      >
+
+        <p className="text-slate-400">
+          Loading event...
+        </p>
+
+
+      </main>
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+  if(error || !event){
+
+
+    return (
+
+      <main
+        className="
+          min-h-screen
+          flex
+          items-center
+          justify-center
+          p-8
+        "
+      >
+
+        <div
+          className="
+            glass
+            rounded-3xl
+            p-10
+            text-center
+          "
+        >
+
+          <h1
+            className="
+              text-3xl
+              font-bold
+            "
+          >
+            Event Not Found
+          </h1>
+
+
+          <button
+            onClick={()=>router.back()}
+            className="
+              mt-6
+              rounded-full
+              bg-white/10
+              px-6
+              py-3
+            "
+          >
+            ← Back
+          </button>
+
+
+        </div>
+
+
+      </main>
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+
+
+  const gallery = event.media?.filter(
+    (item:any)=>item.type === "gallery"
+  ) || [];
+
+
+
+  const highlights = event.media?.filter(
+    (item:any)=>item.type === "highlight"
+  ) || [];
+
+
+
+
+
+
+
 
 
   return (
@@ -52,14 +214,19 @@ export default function EventDetail() {
       className="
         min-h-screen
         p-8
+        relative
       "
     >
 
 
 
+
       {/* Back Button */}
+
       <button
-        onClick={() => router.back()}
+
+        onClick={()=>router.back()}
+
         className="
           fixed
           top-8
@@ -76,9 +243,16 @@ export default function EventDetail() {
           hover:bg-white/20
           transition
         "
+
       >
+
         ← Back
+
       </button>
+
+
+
+
 
 
 
@@ -94,7 +268,12 @@ export default function EventDetail() {
 
 
 
-        {/* Event Header */}
+
+
+
+
+        {/* Hero */}
+
 
         <div
           className="
@@ -114,17 +293,30 @@ export default function EventDetail() {
             "
           >
 
-            <img
-              src={eventData.thumbnail}
-              alt={eventData.title}
-              className="
-                w-full
-                h-full
-                object-cover
-              "
-            />
+
+            {
+              event.thumbnail && (
+
+                <img
+
+                  src={event.thumbnail}
+
+                  alt={event.title}
+
+                  className="
+                    w-full
+                    h-full
+                    object-cover
+                  "
+
+                />
+
+              )
+            }
+
 
           </div>
+
 
 
 
@@ -138,8 +330,9 @@ export default function EventDetail() {
                 font-bold
               "
             >
-              {eventData.title}
+              {event.title}
             </h1>
+
 
 
 
@@ -150,8 +343,10 @@ export default function EventDetail() {
                 text-lg
               "
             >
-              {eventData.name}
+              {event.name}
             </p>
+
+
 
 
 
@@ -166,11 +361,15 @@ export default function EventDetail() {
                 text-blue-300
               "
             >
-              📅 {eventData.date}
+
+              📅 {event.date}
+
             </div>
 
 
+
           </div>
+
 
 
         </div>
@@ -181,72 +380,92 @@ export default function EventDetail() {
 
 
 
+
+
         {/* Gallery */}
 
-        <section className="mt-12">
+
+        {
+          gallery.length > 0 && (
+
+            <section className="mt-12">
 
 
-          <h2
-            className="
-              text-3xl
-              font-bold
-            "
-          >
-            📸 Gallery
-          </h2>
+              <h2
+                className="
+                  text-3xl
+                  font-bold
+                "
+              >
+                📸 Gallery
+              </h2>
 
 
 
 
-          <div
-            className="
-              grid
-              md:grid-cols-3
-              gap-6
-              mt-6
-            "
-          >
 
-            {
-              eventData.gallery.map((photo,index)=>(
-
-                <div
-                  key={index}
-                  className="
-                    aspect-square
-                    rounded-2xl
-                    overflow-hidden
-                    bg-gradient-to-br
-                    from-slate-900
-                    to-blue-600
-                    cursor-pointer
-                    hover:scale-105
-                    transition
-                  "
-                >
-
-                  <img
-                    src={photo}
-                    alt={`gallery-${index}`}
-                    className="
-                      w-full
-                      h-full
-                      object-cover
-                    "
-                  />
-
-                </div>
+              <div
+                className="
+                  grid
+                  md:grid-cols-3
+                  gap-6
+                  mt-6
+                "
+              >
 
 
-              ))
-            }
+                {
+                  gallery.map((item:any,index:number)=>(
 
 
-          </div>
+                    <div
+
+                      key={index}
+
+                      className="
+                        aspect-square
+                        rounded-2xl
+                        overflow-hidden
+                        bg-gradient-to-br
+                        from-slate-900
+                        to-blue-600
+                        hover:scale-105
+                        transition
+                      "
+
+                    >
 
 
-        </section>
+                      <img
 
+                        src={item.url}
+
+                        alt={item.title}
+
+                        className="
+                          w-full
+                          h-full
+                          object-cover
+                        "
+
+                      />
+
+
+                    </div>
+
+
+                  ))
+                }
+
+
+              </div>
+
+
+            </section>
+
+
+          )
+        }
 
 
 
@@ -258,8 +477,10 @@ export default function EventDetail() {
 
         {/* Highlights */}
 
+
         {
-          eventData.highlights.length > 0 && (
+          highlights.length > 0 && (
+
 
             <section
               className="
@@ -281,6 +502,7 @@ export default function EventDetail() {
 
 
 
+
               <div
                 className="
                   grid
@@ -292,10 +514,13 @@ export default function EventDetail() {
 
 
                 {
-                  eventData.highlights.map((item,index)=>(
+                  highlights.map((item:any,index:number)=>(
+
 
                     <div
+
                       key={index}
+
                       className="
                         glass
                         rounded-2xl
@@ -303,14 +528,11 @@ export default function EventDetail() {
                         hover:-translate-y-2
                         transition
                       "
+
                     >
 
 
-                      <div
-                        className="
-                          text-5xl
-                        "
-                      >
+                      <div className="text-5xl">
                         🎥
                       </div>
 
@@ -330,21 +552,13 @@ export default function EventDetail() {
 
 
 
-                      <p
-                        className="
-                          mt-2
-                          text-slate-400
-                        "
-                      >
-                        Watch event recording
-                      </p>
-
-
-
 
                       <a
+
                         href={item.url}
+
                         target="_blank"
+
                         className="
                           inline-flex
                           mt-5
@@ -354,13 +568,16 @@ export default function EventDetail() {
                           border-white/20
                           px-5
                           py-2
-                          text-white
                           hover:bg-white/20
                           transition
                         "
+
                       >
+
                         ▶ Watch
+
                       </a>
+
 
 
 
@@ -374,18 +591,25 @@ export default function EventDetail() {
               </div>
 
 
+
             </section>
+
 
           )
         }
 
 
 
+
+
+
       </div>
+
 
 
     </main>
 
   );
+
 
 }
