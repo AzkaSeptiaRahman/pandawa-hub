@@ -1,44 +1,98 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Button from "@/components/Button";
+import { useEffect, useState } from "react";
 
-export default function Photo() {
+
+export default function Photo(){
+
+
   const router = useRouter();
 
+
+  const [data,setData] = useState<any>(null);
+
+
+
+
+  useEffect(()=>{
+
+
+    const result = sessionStorage.getItem(
+      "photoResult"
+    );
+
+
+    if(result){
+
+      setData(JSON.parse(result));
+
+    }
+
+
+  },[]);
+
+
+
+
+
+
+
+  if(!data){
+
+
+    return (
+
+      <main
+        className="
+          min-h-screen
+          flex
+          items-center
+          justify-center
+        "
+      >
+
+        <p className="text-slate-400">
+          No photo data found
+        </p>
+
+
+      </main>
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+
   return (
+
     <main
       className="
         min-h-screen
-        flex
-        items-center
-        justify-center
         p-8
-        relative
       "
     >
 
-      {/* Back Button */}
+
+
+      {/* Back */}
+
       <button
-        onClick={() => router.back()}
+        onClick={()=>router.back()}
         className="
-          fixed
-          top-8
-          left-8
-          z-50
-          flex
-          items-center
-          gap-2
           rounded-full
           bg-white/10
-          border
-          border-white/20
-          backdrop-blur-xl
           px-5
           py-3
-          text-slate-200
-          hover:bg-white/20
-          transition
+          border
+          border-white/20
         "
       >
         ← Back
@@ -46,21 +100,31 @@ export default function Photo() {
 
 
 
-      {/* Main Card */}
+
+
+
+
       <div
         className="
-          glass
-          rounded-3xl
-          p-10
-          max-w-3xl
-          w-full
-          shadow-[0_20px_60px_rgba(0,0,0,.35)]
+          max-w-6xl
+          mx-auto
+          mt-10
         "
       >
 
 
-        {/* Header */}
-        <div className="text-center">
+
+
+
+        {/* Student Detail */}
+
+        <div
+          className="
+            glass
+            rounded-3xl
+            p-8
+          "
+        >
 
           <h1
             className="
@@ -68,123 +132,37 @@ export default function Photo() {
               font-bold
             "
           >
-            Your Photos
+
+            {data.student.name}
+
           </h1>
 
 
-          <p
+
+          <div
             className="
-              mt-3
-              text-slate-400
+              mt-5
+              text-slate-300
+              leading-8
             "
           >
-            Your graduation memories are ready
-          </p>
 
-        </div>
+            Graduation Number:
+            {" "}
+            {data.student.graduation_number}
 
+            <br />
 
-
-        {/* Photo Grid */}
-        <div
-          className="
-            grid
-            grid-cols-3
-            gap-5
-            mt-10
-          "
-        >
-
-          {[1, 2, 3].map((i) => (
-
-            <div
-              key={i}
-              className="
-                aspect-square
-                rounded-2xl
-                bg-gradient-to-br
-                from-slate-900
-                to-blue-600
-                flex
-                items-center
-                justify-center
-                text-5xl
-                cursor-pointer
-                hover:scale-105
-                transition
-                duration-300
-              "
-            >
-              📸
-            </div>
-
-          ))}
-
-        </div>
+            Faculty:
+            {" "}
+            {data.student.faculty}
 
 
+            <br />
 
-
-        {/* User Information */}
-        <div
-          className="
-            mt-10
-            rounded-2xl
-            bg-black/20
-            border
-            border-white/10
-            p-6
-          "
-        >
-
-          <div className="space-y-5">
-
-
-            <div>
-              <p className="text-sm text-slate-400">
-                Name
-              </p>
-
-              <p className="text-lg font-semibold">
-                Ahmad Fauzan
-              </p>
-            </div>
-
-
-
-            <div>
-              <p className="text-sm text-slate-400">
-                Graduation Number
-              </p>
-
-              <p className="text-lg font-semibold">
-                WIS-2026-001
-              </p>
-            </div>
-
-
-
-            <div>
-              <p className="text-sm text-slate-400">
-                Faculty
-              </p>
-
-              <p className="text-lg font-semibold">
-                Computer Science
-              </p>
-            </div>
-
-
-
-            <div>
-              <p className="text-sm text-slate-400">
-                Study Program
-              </p>
-
-              <p className="text-lg font-semibold">
-                Information Technology
-              </p>
-            </div>
+            Program:
+            {" "}
+            {data.student.study_program}
 
 
           </div>
@@ -196,79 +174,155 @@ export default function Photo() {
 
 
 
-        {/* Action Buttons */}
-        <div
-          className="
-            flex
-            flex-col
-            items-center
-            gap-4
-            mt-8
-          "
-        >
-
-          {/* Download */}
-          <Button>
-            DOWNLOAD ALL PHOTOS
-          </Button>
-
-
-
-          {/* Return Home */}
-          <button
-            onClick={() => router.push("/")}
-            className="
-              rounded-full
-              px-6
-              py-3
-              bg-white/10
-              border
-              border-white/20
-              text-slate-200
-              backdrop-blur-xl
-              hover:bg-white/20
-              transition
-            "
-          >
-            ← Return to Home
-          </button>
-
-
-        </div>
 
 
 
 
-        {/* Report */}
-        <p
-          className="
-            text-center
-            mt-8
-            text-sm
-            text-slate-300
-          "
-        >
+        {/* Photo Section */}
 
-          Wrong photo?
+        <PhotoSection
 
-          <a
-            href="mailto:graduation@university.ac.id"
-            className="
-              text-cyan-400
-              ml-2
-              hover:underline
-            "
-          >
-            Report
-          </a>
+          title="📸 BEBAS"
 
-        </p>
+          photos={data.photos.BEBAS}
+
+        />
+
+
+
+        <PhotoSection
+
+          title="🎓 KUNCIR"
+
+          photos={data.photos.KUNCIR}
+
+        />
+
+
+
+        <PhotoSection
+
+          title="📜 IJAZAH"
+
+          photos={data.photos.IJAZAH}
+
+        />
+
+
 
 
 
       </div>
 
 
+
     </main>
+
   );
+
+}
+
+
+
+
+
+
+
+
+function PhotoSection({
+  title,
+  photos
+}:{
+  title:string;
+  photos:any[];
+}){
+
+
+  if(!photos || photos.length === 0){
+
+    return null;
+
+  }
+
+
+
+  return (
+
+    <section
+      className="
+        mt-12
+      "
+    >
+
+
+      <h2
+        className="
+          text-3xl
+          font-bold
+        "
+      >
+
+        {title}
+
+      </h2>
+
+
+
+
+
+      <div
+        className="
+          grid
+          md:grid-cols-3
+          gap-6
+          mt-6
+        "
+      >
+
+        {
+          photos.map((photo,index)=>(
+
+
+            <div
+
+              key={index}
+
+              className="
+                rounded-2xl
+                overflow-hidden
+                glass
+                aspect-square
+              "
+
+            >
+
+              <img
+
+                src={photo.url}
+
+                alt="graduation photo"
+
+                className="
+                  w-full
+                  h-full
+                  object-cover
+                "
+
+              />
+
+
+            </div>
+
+
+          ))
+        }
+
+
+      </div>
+
+
+    </section>
+
+  );
+
 }

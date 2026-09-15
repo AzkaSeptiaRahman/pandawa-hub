@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Button from "@/components/Button";
 
+
 export default function Search() {
+
 
   const router = useRouter();
 
@@ -12,26 +14,43 @@ export default function Search() {
   const [graduationNumber, setGraduationNumber] = useState("");
 
   const [facultyOpen, setFacultyOpen] = useState(false);
+
   const [studyOpen, setStudyOpen] = useState(false);
 
-  const [faculty, setFaculty] = useState("Select Faculty");
-  const [study, setStudy] = useState("Select Study Program");
+
+  const [faculty, setFaculty] = useState(
+    "Select Faculty"
+  );
+
+  const [study, setStudy] = useState(
+    "Select Study Program"
+  );
+
 
   const [error, setError] = useState("");
 
+  const [loading, setLoading] = useState(false);
 
 
-  const handleSearch = () => {
 
 
-    // Required field validation
+
+  const handleSearch = async () => {
+
+
+    setError("");
+
+
+
     if (
       !graduationNumber ||
       faculty === "Select Faculty" ||
       study === "Select Study Program"
     ) {
 
-      setError("Please complete all required fields");
+      setError(
+        "Please complete all required fields"
+      );
 
       return;
 
@@ -39,25 +58,135 @@ export default function Search() {
 
 
 
-    // Graduation number validation (4 digit)
+
+
     const graduationRegex = /^\d{4}$/;
 
 
-    if (!graduationRegex.test(graduationNumber)) {
+    if(!graduationRegex.test(graduationNumber)){
 
-      setError("Graduation number must be 4 digits");
+
+      setError(
+        "Graduation number must be 4 digits"
+      );
+
 
       return;
+
 
     }
 
 
 
-    setError("");
 
-    router.push("/photo");
+
+
+    try {
+
+
+      setLoading(true);
+
+
+
+      const response = await fetch(
+        "http://localhost:5000/api/photos/search",
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":"application/json"
+          },
+
+
+          body:JSON.stringify({
+
+            eventId:1,
+
+            graduationNumber,
+
+            faculty,
+
+            studyProgram:study
+
+          })
+
+        }
+      );
+
+
+
+
+
+      const data = await response.json();
+
+
+
+
+
+      if(!response.ok){
+
+
+        setError(
+          data.message || "Data not found"
+        );
+
+
+        return;
+
+
+      }
+
+
+
+
+
+
+
+      sessionStorage.setItem(
+
+        "photoResult",
+
+        JSON.stringify(data)
+
+      );
+
+
+
+
+
+      router.push("/photo");
+
+
+
+
+
+    } catch(error){
+
+
+      setError(
+        "Cannot connect to server"
+      );
+
+
+
+    } finally {
+
+
+      setLoading(false);
+
+
+    }
+
+
 
   };
+
+
+
+
+
+
 
 
 
@@ -76,17 +205,17 @@ export default function Search() {
 
 
 
-      {/* Back Button */}
+      {/* Back */}
+
       <button
-        onClick={() => router.back()}
+
+        onClick={()=>router.back()}
+
         className="
           fixed
           top-8
           left-8
           z-50
-          flex
-          items-center
-          gap-2
           rounded-full
           bg-white/10
           border
@@ -94,12 +223,15 @@ export default function Search() {
           backdrop-blur-xl
           px-5
           py-3
-          text-slate-200
+          text-white
           hover:bg-white/20
           transition
         "
+
       >
+
         ← Back
+
       </button>
 
 
@@ -107,7 +239,8 @@ export default function Search() {
 
 
 
-      {/* Card */}
+
+
 
       <div
         className="
@@ -116,15 +249,12 @@ export default function Search() {
           p-10
           w-full
           max-w-lg
-          shadow-[0_20px_60px_rgba(0,0,0,.35)]
         "
       >
 
 
 
 
-
-        {/* Header */}
 
         <div className="text-center">
 
@@ -135,8 +265,11 @@ export default function Search() {
               font-bold
             "
           >
+
             Find Your Photo
+
           </h1>
+
 
 
           <p
@@ -145,8 +278,11 @@ export default function Search() {
               text-slate-400
             "
           >
-            Enter your graduation information to find your photos
+
+            Enter your graduation information
+
           </p>
+
 
 
         </div>
@@ -157,7 +293,7 @@ export default function Search() {
 
 
 
-        {/* Form */}
+
 
         <div className="mt-8 space-y-5">
 
@@ -175,16 +311,18 @@ export default function Search() {
 
             maxLength={4}
 
-            onChange={(e) => {
+            onChange={(e)=>{
+
 
               const value = e.target.value;
 
 
-              if (/^\d*$/.test(value)) {
+              if(/^\d*$/.test(value)){
 
                 setGraduationNumber(value);
 
               }
+
 
             }}
 
@@ -197,11 +335,9 @@ export default function Search() {
               bg-black/30
               border
               border-white/20
-              outline-none
               text-white
+              outline-none
               placeholder:text-slate-400
-              focus:border-blue-400
-              transition
             "
 
           />
@@ -212,7 +348,9 @@ export default function Search() {
 
 
 
-          {/* Faculty Dropdown */}
+
+
+          {/* Faculty */}
 
           <div className="relative">
 
@@ -221,7 +359,7 @@ export default function Search() {
 
               type="button"
 
-              onClick={() => setFacultyOpen(!facultyOpen)}
+              onClick={()=>setFacultyOpen(!facultyOpen)}
 
               className="
                 w-full
@@ -234,15 +372,13 @@ export default function Search() {
                 flex
                 justify-between
                 items-center
-                transition
               "
 
             >
 
               {faculty}
 
-
-              <span className="text-slate-300 text-sm">
+              <span>
                 ▼
               </span>
 
@@ -262,10 +398,9 @@ export default function Search() {
                     z-50
                     mt-2
                     w-full
+                    bg-white
                     rounded-xl
                     overflow-hidden
-                    bg-white
-                    shadow-xl
                   "
                 >
 
@@ -274,13 +409,15 @@ export default function Search() {
                       "Computer Science",
                       "Engineering",
                       "Economics"
-                    ].map((item)=>(
+                    ]
+                    .map((item)=>(
+
 
                       <div
 
                         key={item}
 
-                        onClick={() => {
+                        onClick={()=>{
 
                           setFaculty(item);
 
@@ -292,9 +429,8 @@ export default function Search() {
                           px-5
                           py-3
                           text-black
-                          cursor-pointer
                           hover:bg-blue-100
-                          transition
+                          cursor-pointer
                         "
 
                       >
@@ -307,10 +443,12 @@ export default function Search() {
                     ))
                   }
 
+
                 </div>
 
               )
             }
+
 
 
           </div>
@@ -323,7 +461,7 @@ export default function Search() {
 
 
 
-          {/* Study Program Dropdown */}
+          {/* Study */}
 
           <div className="relative">
 
@@ -332,7 +470,7 @@ export default function Search() {
 
               type="button"
 
-              onClick={() => setStudyOpen(!studyOpen)}
+              onClick={()=>setStudyOpen(!studyOpen)}
 
               className="
                 w-full
@@ -345,7 +483,6 @@ export default function Search() {
                 flex
                 justify-between
                 items-center
-                transition
               "
 
             >
@@ -353,7 +490,7 @@ export default function Search() {
               {study}
 
 
-              <span className="text-slate-300 text-sm">
+              <span>
                 ▼
               </span>
 
@@ -373,25 +510,27 @@ export default function Search() {
                     z-50
                     mt-2
                     w-full
+                    bg-white
                     rounded-xl
                     overflow-hidden
-                    bg-white
-                    shadow-xl
                   "
                 >
+
 
                   {
                     [
                       "Information Technology",
                       "Computer Science",
                       "Information System"
-                    ].map((item)=>(
+                    ]
+                    .map((item)=>(
+
 
                       <div
 
                         key={item}
 
-                        onClick={() => {
+                        onClick={()=>{
 
                           setStudy(item);
 
@@ -403,9 +542,8 @@ export default function Search() {
                           px-5
                           py-3
                           text-black
-                          cursor-pointer
                           hover:bg-blue-100
-                          transition
+                          cursor-pointer
                         "
 
                       >
@@ -417,6 +555,7 @@ export default function Search() {
 
                     ))
                   }
+
 
                 </div>
 
@@ -433,7 +572,8 @@ export default function Search() {
 
 
 
-          {/* Error Message */}
+
+          {/* Error */}
 
           {
             error && (
@@ -466,7 +606,8 @@ export default function Search() {
 
 
 
-          {/* Search Button */}
+
+          {/* Button */}
 
           <div
             className="
@@ -476,14 +617,27 @@ export default function Search() {
             "
           >
 
+
             <Button
+
               onClick={handleSearch}
+
             >
-              SEARCH PHOTO
+
+              {
+                loading
+                ?
+                "SEARCHING..."
+                :
+                "SEARCH PHOTO"
+              }
+
+
             </Button>
 
 
           </div>
+
 
 
 
@@ -498,4 +652,5 @@ export default function Search() {
     </main>
 
   );
+
 }
