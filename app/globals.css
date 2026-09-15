@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+
+:root {
+  --background:#050505;
+}
+
+
+*{
+  box-sizing:border-box;
+}
+
+
+body{
+
+  min-height:100vh;
+
+  color:white;
+
+  background:
+  radial-gradient(
+    circle at top,
+    #123b88,
+    #050505 55%
+  );
+
+}
+
+
+/* glass */
+
+.glass{
+
+background:
+rgba(255,255,255,.08);
+
+border:
+1px solid rgba(255,255,255,.15);
+
+backdrop-filter:
+blur(20px);
+
+}
+
+
+/* glow */
+
+.glow{
+
+position:fixed;
+
+width:500px;
+
+height:500px;
+
+background:#0066ff;
+
+filter:blur(150px);
+
+opacity:.35;
+
+top:-150px;
+
+left:50%;
+
+transform:translateX(-50%);
+
+}
+
+
+
+/* animation */
+
+.animate-float{
+
+animation:
+float 5s ease-in-out infinite;
+
+}
+
+
+@keyframes float{
+
+0%,100%{
+transform:translateY(0)
+}
+
+50%{
+transform:translateY(-15px)
+}
+
+}
+
+
+.gradient-text{
+
+background:
+linear-gradient(
+90deg,
+#fff,
+#38bdf8
+);
+
+-webkit-background-clip:text;
+
+color:transparent;
+
+}
