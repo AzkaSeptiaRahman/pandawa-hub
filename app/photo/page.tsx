@@ -4,18 +4,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 
-export default function Photo(){
+export default function Photo() {
 
 
   const router = useRouter();
 
 
-  const [data,setData] = useState<any>(null);
+  const [data, setData] = useState<any>(null);
 
 
 
 
-  useEffect(()=>{
+  useEffect(() => {
 
 
     const result = sessionStorage.getItem(
@@ -25,12 +25,14 @@ export default function Photo(){
 
     if(result){
 
-      setData(JSON.parse(result));
+      setData(
+        JSON.parse(result)
+      );
 
     }
 
 
-  },[]);
+  }, []);
 
 
 
@@ -49,21 +51,57 @@ export default function Photo(){
           flex
           items-center
           justify-center
+          p-8
         "
       >
 
-        <p className="text-slate-400">
-          No photo data found
-        </p>
+        <div
+          className="
+            glass
+            rounded-3xl
+            p-10
+            text-center
+          "
+        >
+
+          <h1
+            className="
+              text-2xl
+              font-bold
+            "
+          >
+
+            No Photo Data Found
+
+          </h1>
+
+
+          <button
+            onClick={()=>router.push("/events")}
+            className="
+              mt-5
+              rounded-full
+              bg-white/10
+              px-6
+              py-3
+              border
+              border-white/20
+            "
+          >
+
+            Return To Events
+
+          </button>
+
+
+        </div>
 
 
       </main>
 
     );
 
-
   }
-
 
 
 
@@ -82,21 +120,34 @@ export default function Photo(){
 
 
 
+
       {/* Back */}
 
       <button
+
         onClick={()=>router.back()}
+
         className="
+          fixed
+          top-8
+          left-8
+          z-50
           rounded-full
           bg-white/10
-          px-5
-          py-3
           border
           border-white/20
+          px-5
+          py-3
+          text-white
+          backdrop-blur-xl
         "
+
       >
+
         ← Back
+
       </button>
+
 
 
 
@@ -108,9 +159,10 @@ export default function Photo(){
         className="
           max-w-6xl
           mx-auto
-          mt-10
         "
       >
+
+
 
 
 
@@ -123,8 +175,10 @@ export default function Photo(){
             glass
             rounded-3xl
             p-8
+            text-center
           "
         >
+
 
           <h1
             className="
@@ -147,22 +201,25 @@ export default function Photo(){
             "
           >
 
-            Graduation Number:
-            {" "}
-            {data.student.graduation_number}
-
-            <br />
-
-            Faculty:
-            {" "}
-            {data.student.faculty}
+            <p>
+              Graduation Number:
+              {" "}
+              {data.student.graduation_number}
+            </p>
 
 
-            <br />
+            <p>
+              Faculty:
+              {" "}
+              {data.student.faculty}
+            </p>
 
-            Program:
-            {" "}
-            {data.student.study_program}
+
+            <p>
+              Program:
+              {" "}
+              {data.student.study_program}
+            </p>
 
 
           </div>
@@ -178,11 +235,11 @@ export default function Photo(){
 
 
 
-        {/* Photo Section */}
+        {/* Photos */}
 
-        <PhotoSection
+        <PhotoCategory
 
-          title="📸 BEBAS"
+          title="📸 Foto Bebas"
 
           photos={data.photos.BEBAS}
 
@@ -190,9 +247,9 @@ export default function Photo(){
 
 
 
-        <PhotoSection
+        <PhotoCategory
 
-          title="🎓 KUNCIR"
+          title="🎓 Foto Kuncir"
 
           photos={data.photos.KUNCIR}
 
@@ -200,9 +257,9 @@ export default function Photo(){
 
 
 
-        <PhotoSection
+        <PhotoCategory
 
-          title="📜 IJAZAH"
+          title="📜 Foto Ijazah"
 
           photos={data.photos.IJAZAH}
 
@@ -212,7 +269,51 @@ export default function Photo(){
 
 
 
+
+
+
+
+        {/* Download Button */}
+
+        <div
+          className="
+            flex
+            justify-center
+            mt-12
+            pb-10
+          "
+        >
+
+          <button
+
+            className="
+              rounded-full
+              bg-blue-500/20
+              border
+              border-blue-400/30
+              px-8
+              py-4
+              text-blue-300
+              hover:bg-blue-500/30
+              transition
+            "
+
+          >
+
+            DOWNLOAD ALL PHOTOS
+
+          </button>
+
+
+        </div>
+
+
+
+
+
       </div>
+
+
 
 
 
@@ -229,12 +330,19 @@ export default function Photo(){
 
 
 
-function PhotoSection({
+
+function PhotoCategory({
+
   title,
+
   photos
+
 }:{
+
   title:string;
+
   photos:any[];
+
 }){
 
 
@@ -246,6 +354,7 @@ function PhotoSection({
 
 
 
+
   return (
 
     <section
@@ -253,6 +362,7 @@ function PhotoSection({
         mt-12
       "
     >
+
 
 
       <h2
@@ -270,6 +380,8 @@ function PhotoSection({
 
 
 
+
+
       <div
         className="
           grid
@@ -278,6 +390,8 @@ function PhotoSection({
           mt-6
         "
       >
+
+
 
         {
           photos.map((photo,index)=>(
@@ -288,24 +402,28 @@ function PhotoSection({
               key={index}
 
               className="
+                glass
                 rounded-2xl
                 overflow-hidden
-                glass
                 aspect-square
               "
 
             >
 
+
               <img
 
                 src={photo.url}
 
-                alt="graduation photo"
+                alt={photo.type}
 
                 className="
                   w-full
                   h-full
                   object-cover
+                  hover:scale-110
+                  transition
+                  duration-500
                 "
 
               />
@@ -318,7 +436,10 @@ function PhotoSection({
         }
 
 
+
       </div>
+
+
 
 
     </section>

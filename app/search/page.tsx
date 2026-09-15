@@ -1,7 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import Button from "@/components/Button";
 
 
@@ -9,6 +10,11 @@ export default function Search() {
 
 
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+
+  const eventId = searchParams.get("event");
+
 
 
   const [graduationNumber, setGraduationNumber] = useState("");
@@ -18,18 +24,24 @@ export default function Search() {
   const [studyOpen, setStudyOpen] = useState(false);
 
 
+
   const [faculty, setFaculty] = useState(
     "Select Faculty"
   );
+
 
   const [study, setStudy] = useState(
     "Select Study Program"
   );
 
 
+
   const [error, setError] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+
+
 
 
 
@@ -42,14 +54,12 @@ export default function Search() {
 
 
 
-    if (
-      !graduationNumber ||
-      faculty === "Select Faculty" ||
-      study === "Select Study Program"
-    ) {
+    // Check event
+
+    if(!eventId){
 
       setError(
-        "Please complete all required fields"
+        "Invalid event. Please select event again."
       );
 
       return;
@@ -60,7 +70,39 @@ export default function Search() {
 
 
 
+
+    // Required validation
+
+    if (
+
+      !graduationNumber ||
+
+      faculty === "Select Faculty" ||
+
+      study === "Select Study Program"
+
+    ) {
+
+
+      setError(
+        "Please complete all required fields"
+      );
+
+
+      return;
+
+    }
+
+
+
+
+
+
+
+    // Graduation number validation
+
     const graduationRegex = /^\d{4}$/;
+
 
 
     if(!graduationRegex.test(graduationNumber)){
@@ -81,6 +123,9 @@ export default function Search() {
 
 
 
+
+
+
     try {
 
 
@@ -88,31 +133,49 @@ export default function Search() {
 
 
 
+
       const response = await fetch(
+
         "http://localhost:5000/api/photos/search",
+
         {
 
           method:"POST",
 
+          cache:"no-store",
+
+
           headers:{
+
             "Content-Type":"application/json"
+
           },
+
 
 
           body:JSON.stringify({
 
-            eventId:1,
+
+            eventId:Number(eventId),
+
 
             graduationNumber,
 
+
             faculty,
 
+
             studyProgram:study
+
+
 
           })
 
         }
+
       );
+
+
 
 
 
@@ -124,11 +187,15 @@ export default function Search() {
 
 
 
+
+
       if(!response.ok){
 
 
         setError(
+
           data.message || "Data not found"
+
         );
 
 
@@ -155,7 +222,11 @@ export default function Search() {
 
 
 
+
+
       router.push("/photo");
+
+
 
 
 
@@ -165,7 +236,9 @@ export default function Search() {
 
 
       setError(
+
         "Cannot connect to server"
+
       );
 
 
@@ -190,9 +263,14 @@ export default function Search() {
 
 
 
+
+
+
+
   return (
 
     <main
+
       className="
         min-h-screen
         flex
@@ -201,11 +279,15 @@ export default function Search() {
         p-8
         relative
       "
+
     >
 
 
 
-      {/* Back */}
+
+
+      {/* Back Button */}
+
 
       <button
 
@@ -232,6 +314,7 @@ export default function Search() {
 
         ← Back
 
+
       </button>
 
 
@@ -243,6 +326,7 @@ export default function Search() {
 
 
       <div
+
         className="
           glass
           rounded-3xl
@@ -250,7 +334,9 @@ export default function Search() {
           w-full
           max-w-lg
         "
+
       >
+
 
 
 
@@ -260,29 +346,35 @@ export default function Search() {
 
 
           <h1
+
             className="
               text-4xl
               font-bold
             "
+
           >
 
             Find Your Photo
+
 
           </h1>
 
 
 
+
           <p
+
             className="
               mt-3
               text-slate-400
             "
+
           >
 
             Enter your graduation information
 
-          </p>
 
+          </p>
 
 
         </div>
@@ -301,15 +393,23 @@ export default function Search() {
 
 
 
+
+
           {/* Graduation Number */}
+
 
           <input
 
+
             type="text"
+
 
             value={graduationNumber}
 
+
             maxLength={4}
+
+
 
             onChange={(e)=>{
 
@@ -317,16 +417,23 @@ export default function Search() {
               const value = e.target.value;
 
 
+
               if(/^\d*$/.test(value)){
 
+
                 setGraduationNumber(value);
+
 
               }
 
 
             }}
 
+
+
             placeholder="Example: 0001"
+
+
 
             className="
               w-full
@@ -340,6 +447,7 @@ export default function Search() {
               placeholder:text-slate-400
             "
 
+
           />
 
 
@@ -350,16 +458,23 @@ export default function Search() {
 
 
 
-          {/* Faculty */}
+
+
+
+          {/* Faculty Dropdown */}
+
 
           <div className="relative">
 
 
             <button
 
+
               type="button"
 
+
               onClick={()=>setFacultyOpen(!facultyOpen)}
+
 
               className="
                 w-full
@@ -374,13 +489,17 @@ export default function Search() {
                 items-center
               "
 
+
             >
 
+
               {faculty}
+
 
               <span>
                 ▼
               </span>
+
 
 
             </button>
@@ -389,10 +508,13 @@ export default function Search() {
 
 
 
+
             {
               facultyOpen && (
 
+
                 <div
+
                   className="
                     absolute
                     z-50
@@ -402,49 +524,66 @@ export default function Search() {
                     rounded-xl
                     overflow-hidden
                   "
+
                 >
+
 
                   {
                     [
+
                       "Computer Science",
+
                       "Engineering",
+
                       "Economics"
-                    ]
-                    .map((item)=>(
+
+                    ].map((item)=>(
+
 
 
                       <div
 
+
                         key={item}
 
+
                         onClick={()=>{
+
 
                           setFaculty(item);
 
                           setFacultyOpen(false);
 
+
                         }}
+
+
 
                         className="
                           px-5
                           py-3
                           text-black
-                          hover:bg-blue-100
                           cursor-pointer
+                          hover:bg-blue-100
                         "
+
 
                       >
 
                         {item}
 
+
                       </div>
+
 
 
                     ))
                   }
 
 
+
                 </div>
+
 
               )
             }
@@ -461,16 +600,25 @@ export default function Search() {
 
 
 
-          {/* Study */}
+
+
+
+
+          {/* Study Dropdown */}
+
 
           <div className="relative">
 
 
             <button
 
+
               type="button"
 
+
               onClick={()=>setStudyOpen(!studyOpen)}
+
+
 
               className="
                 w-full
@@ -485,7 +633,9 @@ export default function Search() {
                 items-center
               "
 
+
             >
+
 
               {study}
 
@@ -501,10 +651,17 @@ export default function Search() {
 
 
 
+
+
+
             {
+
               studyOpen && (
 
+
                 <div
+
+
                   className="
                     absolute
                     z-50
@@ -514,56 +671,82 @@ export default function Search() {
                     rounded-xl
                     overflow-hidden
                   "
+
+
                 >
 
 
                   {
+
                     [
+
                       "Information Technology",
+
                       "Computer Science",
+
                       "Information System"
-                    ]
-                    .map((item)=>(
+
+                    ].map((item)=>(
+
 
 
                       <div
 
+
                         key={item}
 
+
+
                         onClick={()=>{
+
 
                           setStudy(item);
 
                           setStudyOpen(false);
 
+
                         }}
+
+
 
                         className="
                           px-5
                           py-3
                           text-black
-                          hover:bg-blue-100
                           cursor-pointer
+                          hover:bg-blue-100
                         "
+
 
                       >
 
                         {item}
 
+
                       </div>
 
 
+
                     ))
+
                   }
+
 
 
                 </div>
 
+
               )
+
             }
 
 
+
           </div>
+
+
+
+
 
 
 
@@ -575,10 +758,14 @@ export default function Search() {
 
           {/* Error */}
 
+
           {
+
             error && (
 
+
               <div
+
                 className="
                   rounded-xl
                   bg-red-500/20
@@ -590,14 +777,23 @@ export default function Search() {
                   text-sm
                   text-center
                 "
+
+
               >
 
                 ⚠️ {error}
 
+
               </div>
 
+
             )
+
           }
+
+
+
+
 
 
 
@@ -609,13 +805,17 @@ export default function Search() {
 
           {/* Button */}
 
+
           <div
+
             className="
               flex
               justify-center
               pt-4
             "
+
           >
+
 
 
             <Button
@@ -624,16 +824,25 @@ export default function Search() {
 
             >
 
+
               {
+
                 loading
+
                 ?
+
                 "SEARCHING..."
+
                 :
+
                 "SEARCH PHOTO"
+
+
               }
 
 
             </Button>
+
 
 
           </div>
@@ -645,7 +854,10 @@ export default function Search() {
         </div>
 
 
+
+
       </div>
+
 
 
 
