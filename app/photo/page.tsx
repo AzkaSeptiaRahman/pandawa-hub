@@ -1,41 +1,186 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-
-export default function Photo() {
-
-
-  const router = useRouter();
-
-
-  const [data, setData] = useState<any>(null);
-
-  const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
+import { useRouter } from "next/navigation";
 
 
 
+export default function Photo(){
 
 
-  useEffect(() => {
+    const router = useRouter();
 
 
-    const result = sessionStorage.getItem(
-      "photoResult"
-    );
+    const [data,setData] =
+    useState<any>(null);
 
 
-    if(result){
+    const [loading,setLoading] =
+    useState(true);
 
-      setData(
-        JSON.parse(result)
-      );
+
+    const [error,setError] =
+    useState("");
+
+
+
+
+
+
+    useEffect(()=>{
+
+
+        const loadPhoto = async()=>{
+
+
+            try{
+
+
+                const saved =
+                sessionStorage.getItem(
+                    "photoSearch"
+                );
+
+
+
+                if(!saved){
+
+                    setError(
+                        "Search data not found"
+                    );
+
+                    return;
+
+                }
+
+
+
+
+
+
+                const response =
+                await fetch(
+
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/photos/search`,
+
+                    {
+
+                        method:"POST",
+
+                        headers:{
+
+                            "Content-Type":
+                            "application/json"
+
+                        },
+
+                        body:saved
+
+                    }
+
+                );
+
+
+
+
+
+
+
+
+                const result =
+                await response.json();
+
+
+
+
+
+
+                if(!response.ok){
+
+
+                    setError(
+                        result.message ||
+                        "Photo not found"
+                    );
+
+                    return;
+
+
+                }
+
+
+
+
+
+
+
+                setData(result);
+
+
+
+
+
+
+            }catch(error){
+
+
+                console.error(error);
+
+
+                setError(
+                    "Cannot connect to server"
+                );
+
+
+            }finally{
+
+
+                setLoading(false);
+
+
+            }
+
+
+
+        };
+
+
+
+        loadPhoto();
+
+
+
+    },[]);
+
+
+
+
+
+
+
+
+
+    if(loading){
+
+
+        return(
+
+            <main className="
+            min-h-screen
+            flex
+            items-center
+            justify-center
+            ">
+
+                Loading...
+
+            </main>
+
+        );
 
     }
 
 
-  }, []);
 
 
 
@@ -43,91 +188,68 @@ export default function Photo() {
 
 
 
-  if(!data){
+    if(error || !data){
 
 
-    return (
+        return(
 
-      <main
-        className="
-          min-h-screen
-          flex
-          items-center
-          justify-center
-          p-8
-        "
-      >
-
-        <div
-          className="
-            glass
-            rounded-3xl
-            p-10
-            text-center
-          "
-        >
-
-          <h1
-            className="
-              text-2xl
-              font-bold
-            "
-          >
-            No Photo Data Found
-          </h1>
+            <main className="
+            min-h-screen
+            flex
+            items-center
+            justify-center
+            p-8
+            ">
 
 
-
-          <button
-
-            onClick={()=>router.push("/events")}
-
-            className="
-              mt-5
-              rounded-full
-              bg-white/10
-              px-6
-              py-3
-              border
-              border-white/20
-            "
-
-          >
-
-            Return To Events
-
-          </button>
+                <div className="
+                glass
+                rounded-3xl
+                p-10
+                text-center
+                ">
 
 
-        </div>
+                    <h1 className="
+                    text-2xl
+                    font-bold
+                    ">
 
+                        {error}
 
-      </main>
-
-    );
-
-  }
+                    </h1>
 
 
 
+                    <button
+
+                    onClick={()=>
+                        router.push("/events")
+                    }
+
+                    className="
+                    mt-5
+                    px-6
+                    py-3
+                    rounded-full
+                    bg-white/10
+                    "
+
+                    >
+
+                        Back
+
+                    </button>
 
 
+                </div>
 
 
+            </main>
 
-  const downloadPhotos = () => {
+        );
 
-
-    window.open(
-
-      `http://localhost:5000/api/download/${data.student.id}`,
-
-      "_blank"
-
-    );
-
-
-  };
+    }
 
 
 
@@ -137,324 +259,306 @@ export default function Photo() {
 
 
 
-  return (
+    return(
 
-    <main
-      className="
+        <main className="
         min-h-screen
         p-8
-      "
-    >
+        ">
 
 
 
 
 
-      {/* Back */}
+            <button
 
-      <button
-
-        onClick={()=>router.back()}
-
-        className="
-          fixed
-          top-8
-          left-8
-          z-50
-          rounded-full
-          bg-white/10
-          border
-          border-white/20
-          px-5
-          py-3
-          text-white
-          backdrop-blur-xl
-        "
-
-      >
-
-        ← Back
-
-      </button>
-
-
-
-
-
-
-
-
-      <div
-        className="
-          max-w-6xl
-          mx-auto
-        "
-      >
-
-
-
-
-
-
-
-
-
-        {/* Student Detail */}
-
-
-        <div
-
-          className="
-            glass
-            rounded-3xl
-            p-8
-            text-center
-          "
-
-        >
-
-
-          <h1
+            onClick={()=>router.back()}
 
             className="
-              text-4xl
-              font-bold
+            fixed
+            top-8
+            left-8
+            z-50
+            rounded-full
+            bg-white/10
+            border
+            border-white/20
+            px-5
+            py-3
+            text-white
+            backdrop-blur-xl
             "
 
-          >
+            >
 
-            {data.student.name}
+                ← Back
 
-          </h1>
+            </button>
 
 
 
 
 
-          <div
 
-            className="
-              mt-5
-              text-slate-300
-              leading-8
-            "
 
-          >
 
-            <p>
-              Graduation Number:
-              {" "}
-              {data.student.graduation_number}
-            </p>
 
 
-            <p>
-              Faculty:
-              {" "}
-              {data.student.faculty}
-            </p>
+            <div className="
+            max-w-6xl
+            mx-auto
+            ">
 
 
-            <p>
-              Program:
-              {" "}
-              {data.student.study_program}
-            </p>
 
 
-          </div>
 
 
-        </div>
 
 
+                {/* STUDENT CARD */}
 
 
-
-
-
-
-
-        {/* Photos */}
-
-
-        <PhotoCategory
-
-          title="📸 Foto Bebas"
-
-          photos={data.photos?.BEBAS}
-
-          onClick={setSelectedPhoto}
-
-        />
-
-
-
-        <PhotoCategory
-
-          title="🎓 Foto Kuncir"
-
-          photos={data.photos?.KUNCIR}
-
-          onClick={setSelectedPhoto}
-
-        />
-
-
-
-        <PhotoCategory
-
-          title="📜 Foto Ijazah"
-
-          photos={data.photos?.IJAZAH}
-
-          onClick={setSelectedPhoto}
-
-        />
-
-
-
-
-
-
-
-
-
-
-
-
-        {/* Download */}
-
-
-        <div
-
-          className="
-            flex
-            justify-center
-            mt-12
-            pb-10
-          "
-
-        >
-
-
-          <button
-
-
-            onClick={downloadPhotos}
-
-
-
-            className="
-              rounded-full
-              bg-blue-500/20
-              border
-              border-blue-400/30
-              px-8
-              py-4
-              text-blue-300
-              hover:bg-blue-500/30
-              transition
-            "
-
-
-          >
-
-            DOWNLOAD ALL PHOTOS
-
-
-          </button>
-
-
-
-        </div>
-
-
-
-
-
-      </div>
-
-
-
-
-
-
-
-
-
-      {/* Preview Modal */}
-
-
-      {
-        selectedPhoto && (
-
-          <div
-
-            onClick={()=>setSelectedPhoto(null)}
-
-            className="
-              fixed
-              inset-0
-              z-50
-              bg-black/80
-              flex
-              items-center
-              justify-center
-              p-8
-            "
-
-          >
-
-
-            <img
-
-
-              onClick={(e)=>e.stopPropagation()}
-
-
-              src={
-
-                selectedPhoto.url.startsWith("http")
-
-                ?
-
-                selectedPhoto.url
-
-                :
-
-                `http://localhost:5000${selectedPhoto.url}`
-
-              }
-
-
-              alt="preview"
-
-
-              className="
-                max-h-[85vh]
-                max-w-5xl
+                <div className="
+                glass
                 rounded-3xl
-                object-contain
-              "
+                p-8
+                text-center
+                shadow-xl
+                ">
 
 
-            />
+                    <h1 className="
+                    text-4xl
+                    font-bold
+                    ">
+
+                        {data.student.name}
+
+                    </h1>
 
 
-          </div>
-
-
-        )
-      }
 
 
 
+                    <div className="
+                    mt-5
+                    text-slate-300
+                    space-y-2
+                    ">
 
 
-    </main>
+                        <p>
 
-  );
+                            Graduation Number:
+                            {" "}
+                            {data.student.graduation_number}
+
+                        </p>
+
+
+
+                        <p>
+
+                            Faculty:
+                            {" "}
+                            {data.student.faculty}
+
+                        </p>
+
+
+
+
+                        <p>
+
+                            Program:
+                            {" "}
+                            {data.student.study_program}
+
+                        </p>
+
+
+                    </div>
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                {/* PHOTO CARD */}
+
+
+
+                <PhotoCategory
+
+                title="📸 Foto Bebas"
+
+                subtitle="Foto bebas wisuda"
+
+                photos={
+                    data.photos.BEBAS
+                }
+
+                />
+
+
+
+
+
+
+                <PhotoCategory
+
+                title="🎓 Foto Kuncir"
+
+                subtitle="Foto prosesi kuncir"
+
+                photos={
+                    data.photos.KUNCIR
+                }
+
+                />
+
+
+
+
+
+
+
+                <PhotoCategory
+
+                title="📜 Foto Ijazah"
+
+                subtitle="Foto ijazah resmi"
+
+                photos={
+                    data.photos.IJAZAH
+                }
+
+                />
+
+
+
+
+
+
+
+
+
+                {/* BUTTON */}
+
+
+                <div className="
+                flex
+                justify-center
+                gap-5
+                mt-14
+                pb-10
+                flex-wrap
+                ">
+
+
+
+
+
+                    <button
+
+                    onClick={()=>{
+
+
+                        window.open(
+
+                            `${process.env.NEXT_PUBLIC_API_URL}/api/download/${data.student.id}`,
+
+                            "_blank"
+
+                        );
+
+
+                    }}
+
+                    className="
+                    rounded-full
+                    bg-blue-500/20
+                    border
+                    border-blue-400/30
+                    px-8
+                    py-4
+                    text-blue-300
+                    hover:bg-blue-500/30
+                    transition
+                    "
+
+                    >
+
+                        DOWNLOAD ALL PHOTOS
+
+                    </button>
+
+
+
+
+
+
+
+                    <button
+
+                    onClick={()=>{
+
+                        alert(
+                            "Report sent to administrator"
+                        );
+
+                    }}
+
+                    className="
+                    rounded-full
+                    bg-red-500/20
+                    border
+                    border-red-400/30
+                    px-8
+                    py-4
+                    text-red-300
+                    hover:bg-red-500/30
+                    transition
+                    "
+
+                    >
+
+                        REPORT PROBLEM
+
+                    </button>
+
+
+
+
+                </div>
+
+
+
+
+
+
+            </div>
+
+
+
+
+
+        </main>
+
+
+    );
+
 
 }
 
@@ -468,20 +572,20 @@ export default function Photo() {
 
 function PhotoCategory({
 
-  title,
+    title,
 
-  photos,
+    subtitle,
 
-  onClick
+    photos
 
 
 }:{
 
-  title:string;
+    title:string;
 
-  photos:any[];
+    subtitle:string;
 
-  onClick:(photo:any)=>void;
+    photos:any[];
 
 }){
 
@@ -489,141 +593,165 @@ function PhotoCategory({
 
 
 
-  if(!photos || photos.length === 0){
-
-    return null;
-
-  }
 
 
+    return(
 
-
-
-
-
-
-  return (
-
-    <section
-
-      className="
+        <section className="
         mt-12
-      "
-
-    >
-
-
-
-      <h2
-
-        className="
-          text-3xl
-          font-bold
-        "
-
-      >
-
-        {title}
-
-
-      </h2>
+        ">
 
 
 
 
 
+            <div className="
+            glass
+            rounded-3xl
+            p-6
+            ">
+
+
+
+                <div className="mb-6">
+
+
+                    <h2 className="
+                    text-3xl
+                    font-bold
+                    ">
+
+                        {title}
+
+                    </h2>
+
+
+                    <p className="
+                    text-slate-400
+                    mt-2
+                    ">
+
+                        {subtitle}
+
+                    </p>
+
+
+                </div>
 
 
 
 
-      <div
-
-        className="
-          grid
-          md:grid-cols-3
-          gap-6
-          mt-6
-        "
-
-      >
 
 
 
-        {
-
-          photos.map((photo,index)=>(
 
 
-            <div
+                {
 
-              key={index}
+                    !photos ||
+                    photos.length===0
+
+                    ?
+
+                    (
+
+                    <div className="
+                    rounded-2xl
+                    bg-black/20
+                    border
+                    border-white/10
+                    p-8
+                    text-center
+                    text-slate-400
+                    ">
+
+                        No photo available
+
+                    </div>
+
+                    )
+
+                    :
+
+                    (
+
+                    <div className="
+                    grid
+                    md:grid-cols-3
+                    gap-6
+                    ">
 
 
-              onClick={()=>onClick(photo)}
+                    {
+                        photos.map((photo,index)=>(
 
 
-              className="
-                glass
-                rounded-2xl
-                overflow-hidden
-                aspect-square
-                cursor-pointer
-              "
+                            <div
 
-            >
+                            key={index}
+
+                            className="
+                            rounded-2xl
+                            overflow-hidden
+                            bg-black/20
+                            border
+                            border-white/10
+                            aspect-square
+                            group
+                            "
+
+                            >
 
 
-              <img
+                                <img
+
+                                src={
+
+                                    `${process.env.NEXT_PUBLIC_API_URL}${photo.url}`
+
+                                }
+
+                                alt="Graduation Photo"
+
+                                className="
+                                w-full
+                                h-full
+                                object-cover
+                                group-hover:scale-110
+                                transition
+                                duration-500
+                                "
+
+                                />
 
 
-                src={
 
-                  photo.url.startsWith("http")
+                            </div>
 
-                  ?
 
-                  photo.url
+                        ))
+                    }
 
-                  :
 
-                  `http://localhost:5000${photo.url}`
+                    </div>
+
+                    )
+
 
                 }
 
-
-                alt={photo.type}
-
-
-                className="
-                  w-full
-                  h-full
-                  object-cover
-                  hover:scale-110
-                  transition
-                  duration-500
-                "
-
-
-              />
 
 
             </div>
 
 
-          ))
-
-        }
 
 
 
-      </div>
+        </section>
 
 
+    );
 
-
-
-    </section>
-
-  );
 
 }
