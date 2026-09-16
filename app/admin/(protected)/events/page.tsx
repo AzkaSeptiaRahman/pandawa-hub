@@ -6,9 +6,6 @@ import {
 } from "react";
 
 
-
-
-
 type EventData = {
 
     id:number;
@@ -34,31 +31,27 @@ type EventData = {
 
 
 
-
-
-
 export default function EventsPage(){
-
 
 
     const [events,setEvents] =
     useState<EventData[]>([]);
 
 
-
     const [thumbnail,setThumbnail] =
     useState<File|null>(null);
 
+
+    const [preview,setPreview] =
+    useState<string>("");
 
 
     const [loading,setLoading] =
     useState(false);
 
 
-
     const [message,setMessage] =
     useState("");
-
 
 
 
@@ -83,11 +76,6 @@ export default function EventsPage(){
 
 
 
-
-
-
-
-
     const token =
     typeof window !== "undefined"
 
@@ -103,18 +91,11 @@ export default function EventsPage(){
 
 
 
-
-
-
-
     useEffect(()=>{
 
         loadEvents();
 
     },[]);
-
-
-
 
 
 
@@ -152,14 +133,11 @@ export default function EventsPage(){
 
 
 
-
             setEvents(
 
                 data.events || []
 
             );
-
-
 
 
 
@@ -173,8 +151,6 @@ export default function EventsPage(){
 
 
     };
-
-
 
 
 
@@ -204,8 +180,6 @@ export default function EventsPage(){
 
 
 
-
-
     const changeName=(value:string)=>{
 
 
@@ -221,9 +195,6 @@ export default function EventsPage(){
 
 
     };
-
-
-
 
 
 
@@ -256,6 +227,68 @@ export default function EventsPage(){
 
 
 
+    const handleThumbnail=(
+
+        e:React.ChangeEvent<HTMLInputElement>
+
+    )=>{
+
+
+        const file =
+        e.target.files?.[0];
+
+
+        if(!file)
+        return;
+
+
+
+        setThumbnail(file);
+
+
+
+        const url =
+        URL.createObjectURL(file);
+
+
+
+        setPreview(url);
+
+
+    };
+
+
+
+
+
+
+    const removeThumbnail=()=>{
+
+
+        setThumbnail(null);
+
+        setPreview("");
+
+
+        const input =
+        document.getElementById(
+            "thumbnail"
+        ) as HTMLInputElement;
+
+
+        if(input){
+
+            input.value="";
+
+        }
+
+
+    };
+
+
+
+
+
 
 
     const createEvent = async()=>{
@@ -266,10 +299,7 @@ export default function EventsPage(){
 
             setLoading(true);
 
-
             setMessage("");
-
-
 
 
 
@@ -278,85 +308,51 @@ export default function EventsPage(){
 
 
 
-
             data.append(
-
                 "name",
-
                 form.name
-
             );
 
 
-
             data.append(
-
                 "slug",
-
                 form.slug
-
             );
 
 
-
             data.append(
-
                 "date",
-
                 form.date
-
             );
 
 
-
             data.append(
-
                 "type",
-
                 form.type
-
             );
 
 
-
             data.append(
-
                 "description",
-
                 form.description
-
             );
-
 
 
             data.append(
-
                 "status",
-
                 form.status
-
             );
-
-
 
 
 
             if(thumbnail){
 
-
                 data.append(
-
                     "thumbnail",
-
                     thumbnail
-
                 );
 
-
             }
-
-
-
 
 
 
@@ -375,11 +371,9 @@ export default function EventsPage(){
                     headers:{
 
                         Authorization:
-
                         `Bearer ${token}`
 
                     },
-
 
                     body:data
 
@@ -390,17 +384,8 @@ export default function EventsPage(){
 
 
 
-
-
-
-
-
             const result =
             await res.json();
-
-
-
-
 
 
 
@@ -416,7 +401,6 @@ export default function EventsPage(){
 
                 );
 
-
                 return;
 
 
@@ -425,19 +409,9 @@ export default function EventsPage(){
 
 
 
-
-
-
-
-
             setMessage(
-
                 "Event created"
-
             );
-
-
-
 
 
 
@@ -459,18 +433,11 @@ export default function EventsPage(){
 
 
 
-
-
-            setThumbnail(null);
-
-
+            removeThumbnail();
 
 
 
             loadEvents();
-
-
-
 
 
 
@@ -482,9 +449,7 @@ export default function EventsPage(){
 
 
             setMessage(
-
                 "Server error"
-
             );
 
 
@@ -497,100 +462,104 @@ export default function EventsPage(){
         }
 
 
-
     };
-
-
-
-
-
-
-
-
 
     const deleteEvent = async(id:number)=>{
 
 
-        if(
-
-            !confirm(
-
-                "Delete event?"
-
-            )
-
+    if(
+        !confirm(
+            "Delete event?"
         )
+    ){
 
         return;
 
+    }
 
 
 
+    try{
 
 
+        const res = await fetch(
 
-        try{
+            `${process.env.NEXT_PUBLIC_API_URL}/api/admin/events/${id}`,
 
+            {
 
-            await fetch(
+                method:"DELETE",
 
-`${process.env.NEXT_PUBLIC_API_URL}/api/admin/events/${id}`,
+                headers:{
 
-                {
+                    Authorization:
 
-                    method:"DELETE",
-
-                    headers:{
-
-                        Authorization:
-
-                        `Bearer ${token}`
-
-                    }
+                    `Bearer ${token}`
 
                 }
 
+            }
+
+        );
+
+
+
+        const result =
+        await res.json();
+
+
+
+
+        if(!res.ok){
+
+            alert(
+                result.message ||
+                "Delete failed"
             );
 
-
-
-
-            loadEvents();
-
-
-
-
-
-        }catch(error){
-
-
-            console.error(error);
-
+            return;
 
         }
 
 
-    };
+
+
+        setMessage(
+            "Event deleted"
+        );
+
+
+
+        loadEvents();
 
 
 
 
+    }catch(error){
 
 
+        console.error(
+            error
+        );
 
 
+        setMessage(
+            "Server error"
+        );
 
+
+    }
+
+
+};
     return(
-
 
         <div className="
         space-y-8
         ">
 
 
-
             <div>
-
 
                 <h1 className="
                 text-4xl
@@ -602,7 +571,6 @@ export default function EventsPage(){
                 </h1>
 
 
-
                 <p className="
                 text-slate-400
                 mt-2
@@ -612,10 +580,7 @@ export default function EventsPage(){
 
                 </p>
 
-
             </div>
-
-
 
 
 
@@ -639,9 +604,6 @@ export default function EventsPage(){
                     Create Event
 
                 </h2>
-
-
-
 
 
 
@@ -675,9 +637,6 @@ export default function EventsPage(){
 
 
 
-
-
-
                 <input
 
                 placeholder="Slug"
@@ -686,11 +645,8 @@ export default function EventsPage(){
 
                 onChange={(e)=>
                     updateField(
-
                         "slug",
-
                         e.target.value
-
                     )
                 }
 
@@ -703,8 +659,6 @@ export default function EventsPage(){
                 "
 
                 />
-
-
 
 
 
@@ -720,11 +674,8 @@ export default function EventsPage(){
 
                 onChange={(e)=>
                     updateField(
-
                         "date",
-
                         e.target.value
-
                     )
                 }
 
@@ -744,19 +695,14 @@ export default function EventsPage(){
 
 
 
-
-
                 <select
 
                 value={form.type}
 
                 onChange={(e)=>
                     updateField(
-
                         "type",
-
                         e.target.value
-
                     )
                 }
 
@@ -771,16 +717,12 @@ export default function EventsPage(){
                 >
 
                     <option value="PERSONAL">
-
                         PERSONAL
-
                     </option>
 
 
                     <option value="GALLERY">
-
                         GALLERY
-
                     </option>
 
 
@@ -792,36 +734,147 @@ export default function EventsPage(){
 
 
 
+                {/* THUMBNAIL UPLOAD */}
+
+                <div className="
+                space-y-3
+                ">
 
 
-                <input
+                    <label
 
-                type="file"
+                    htmlFor="thumbnail"
 
-                accept="image/*"
+                    className="
+                    block
+                    cursor-pointer
+                    rounded-2xl
+                    border
+                    border-white/20
+                    bg-white/5
+                    p-6
+                    text-center
+                    hover:bg-white/10
+                    transition
+                    "
 
-                onChange={(e)=>{
+                    >
+
+                        {
+                            preview
+
+                            ?
+
+                            "Replace Thumbnail"
+
+                            :
+
+                            "Choose Thumbnail"
+
+                        }
 
 
-                    if(e.target.files){
+                    </label>
 
-                        setThumbnail(
 
-                            e.target.files[0]
 
-                        );
+
+                    <input
+
+                    id="thumbnail"
+
+                    type="file"
+
+                    accept="image/*"
+
+                    onChange={handleThumbnail}
+
+                    className="hidden"
+
+                    />
+
+
+
+
+
+                    {
+                        preview &&
+
+
+                        <div className="
+                        relative
+                        rounded-2xl
+                        overflow-hidden
+                        border
+                        border-white/20
+                        ">
+
+
+                            <img
+
+                            src={preview}
+
+                            className="
+                            w-full
+                            h-56
+                            object-cover
+                            "
+
+                            />
+
+
+
+                            <button
+
+                            onClick={removeThumbnail}
+
+                            className="
+                            absolute
+                            top-3
+                            right-3
+                            rounded-full
+                            bg-red-500/80
+                            px-4
+                            py-2
+                            "
+
+                            >
+
+                                Remove
+
+                            </button>
+
+
+
+                        </div>
+
 
                     }
 
 
-                }}
 
-                className="
-                w-full
-                "
 
-                />
+                    {
+                        thumbnail &&
 
+
+                        <p className="
+                        text-sm
+                        text-slate-400
+                        text-center
+                        ">
+
+                            Selected:
+                            {" "}
+                            {thumbnail.name}
+
+                        </p>
+
+
+                    }
+
+
+                </div>
 
 
 
@@ -838,11 +891,8 @@ export default function EventsPage(){
 
                 onChange={(e)=>
                     updateField(
-
                         "description",
-
                         e.target.value
-
                     )
                 }
 
@@ -864,18 +914,14 @@ export default function EventsPage(){
 
 
 
-
                 <select
 
                 value={form.status}
 
                 onChange={(e)=>
                     updateField(
-
                         "status",
-
                         e.target.value
-
                     )
                 }
 
@@ -890,21 +936,16 @@ export default function EventsPage(){
                 >
 
                     <option value="active">
-
                         Active
-
                     </option>
 
 
                     <option value="inactive">
-
                         Inactive
-
                     </option>
 
 
                 </select>
-
 
 
 
@@ -939,12 +980,10 @@ export default function EventsPage(){
                         :
 
                         "CREATE EVENT"
+
                     }
 
-
                 </button>
-
-
 
 
 
@@ -954,7 +993,11 @@ export default function EventsPage(){
                 {
                     message &&
 
-                    <p>
+                    <p className="
+                    text-center
+                    text-sm
+                    text-slate-300
+                    ">
 
                         {message}
 
@@ -981,7 +1024,6 @@ export default function EventsPage(){
             ">
 
 
-
                 <h2 className="
                 text-2xl
                 font-bold
@@ -1004,9 +1046,7 @@ export default function EventsPage(){
                 ">
 
 
-
                 {
-
                     events.map((event)=>(
 
 
@@ -1019,19 +1059,21 @@ export default function EventsPage(){
                         bg-black/20
                         border
                         p-6
-                        ">
+                        "
+
+                        >
 
 
 
                             {
-                                event.thumbnail &&
+                                event.thumbnail
+
+                                ?
 
                                 <img
 
                                 src={
-
                                     `${process.env.NEXT_PUBLIC_API_URL}${event.thumbnail}`
-
                                 }
 
                                 className="
@@ -1044,7 +1086,32 @@ export default function EventsPage(){
 
                                 />
 
+                                :
+
+
+                                <div
+
+                                className="
+                                h-48
+                                rounded-xl
+                                mb-5
+                                bg-white/5
+                                flex
+                                items-center
+                                justify-center
+                                text-slate-400
+                                "
+
+                                >
+
+                                    No Thumbnail
+
+                                </div>
+
+
                             }
+
+
 
 
 
@@ -1064,27 +1131,26 @@ export default function EventsPage(){
 
 
 
-                            <p>
+                            <p className="mt-2">
 
                                 Type:
-
                                 {" "}
-
                                 {event.type}
 
                             </p>
 
 
 
+
+
                             <p>
 
                                 Date:
-
                                 {" "}
-
                                 {event.date}
 
                             </p>
+
 
 
 
@@ -1116,11 +1182,11 @@ export default function EventsPage(){
 
 
 
+
                         </div>
 
 
                     ))
-
                 }
 
 

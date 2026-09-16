@@ -1,88 +1,375 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+
+import {
+    useEffect,
+    useState
+} from "react";
 
 
-export default function EventDetail() {
-
-
-  const router = useRouter();
-
-  const params = useParams();
-
-
-  const [event, setEvent] = useState<any>(null);
-
-  const [loading, setLoading] = useState(true);
-
-  const [error, setError] = useState("");
+import {
+    useParams,
+    useRouter
+} from "next/navigation";
 
 
 
 
-  useEffect(() => {
-
-
-    const fetchEvent = async () => {
-
-
-      try {
-
-
-        const response = await fetch(
-          `http://localhost:5000/api/events/${params.id}`
-        );
 
 
 
-        if(!response.ok){
 
-          throw new Error(
-            "Event not found"
-          );
+export default function EventDetail(){
+
+
+    const router =
+    useRouter();
+
+
+    const params =
+    useParams();
+
+
+
+    const id =
+    params.id;
+
+
+
+
+
+
+    const [event,setEvent] =
+    useState<any>(null);
+
+
+
+    const [loading,setLoading] =
+    useState(true);
+
+
+
+    const [error,setError] =
+    useState("");
+
+
+
+
+
+
+
+
+
+    useEffect(()=>{
+
+
+        if(id){
+
+            loadEvent();
 
         }
 
 
-
-        const data = await response.json();
-
-
-
-        setEvent(data);
+    },[id]);
 
 
 
-      } catch(err:any){
-
-
-        setError(err.message);
 
 
 
-      } finally {
 
 
-        setLoading(false);
+
+    const loadEvent = async()=>{
 
 
-      }
+        try{
+
+
+            const response =
+            await fetch(
+
+                `${process.env.NEXT_PUBLIC_API_URL}/api/events/${id}`
+
+            );
+
+
+
+
+            const result =
+            await response.json();
+
+
+
+
+
+            console.log(
+
+                "EVENT DETAIL:",
+
+                result
+
+            );
+
+
+
+
+
+
+            if(!response.ok){
+
+
+                throw new Error(
+
+                    result.message ||
+
+                    "Event not found"
+
+                );
+
+
+            }
+
+
+
+
+
+
+            setEvent(result);
+
+
+
+
+
+        }catch(error:any){
+
+
+
+            console.error(error);
+
+
+
+            setError(
+
+                error.message
+
+            );
+
+
+
+        }finally{
+
+
+            setLoading(false);
+
+
+        }
+
 
 
     };
 
 
 
-    if(params.id){
 
-      fetchEvent();
+
+
+
+
+
+    const imageUrl=(url:string)=>{
+
+
+        if(!url){
+
+            return "";
+
+        }
+
+
+
+
+        return url.startsWith("http")
+
+        ?
+
+        url
+
+        :
+
+        `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+
+
+    };
+
+
+
+
+
+
+
+
+
+    const youtubeThumbnail=(url:string)=>{
+
+
+        if(!url){
+
+            return "";
+
+        }
+
+
+
+
+
+        const match =
+
+        url.match(
+
+            /(?:youtube\.com\/.*v=|youtu\.be\/)([^&]+)/
+
+        );
+
+
+
+
+
+        if(!match){
+
+            return "";
+
+        }
+
+
+
+
+
+        return (
+
+            `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`
+
+        );
+
+
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+    if(loading){
+
+
+        return(
+
+            <main className="
+            min-h-screen
+            flex
+            items-center
+            justify-center
+            ">
+
+                Loading event...
+
+            </main>
+
+        );
+
 
     }
 
 
 
-  }, [params.id]);
+
+
+
+
+
+
+    if(error || !event){
+
+
+        return(
+
+            <main className="
+            min-h-screen
+            flex
+            items-center
+            justify-center
+            p-8
+            ">
+
+
+                <div className="
+                glass
+                rounded-3xl
+                p-10
+                text-center
+                ">
+
+
+                    <h1 className="
+                    text-3xl
+                    font-bold
+                    ">
+
+                    Event Not Found
+
+                    </h1>
+
+
+
+
+                    <p className="
+                    mt-3
+                    text-slate-400
+                    ">
+
+                    {error}
+
+                    </p>
+
+
+
+
+
+                    <button
+
+                    onClick={()=>router.back()}
+
+                    className="
+                    mt-6
+                    px-6
+                    py-3
+                    rounded-full
+                    bg-white/10
+                    "
+
+                    >
+
+                    Back
+
+                    </button>
+
+
+
+                </div>
+
+
+            </main>
+
+        );
+
+
+    }
 
 
 
@@ -92,31 +379,15 @@ export default function EventDetail() {
 
 
 
-  if(loading){
+    const gallery =
 
+    event.media?.filter(
 
-    return (
+        (item:any)=>
 
-      <main
-        className="
-          min-h-screen
-          flex
-          items-center
-          justify-center
-        "
-      >
+        item.type === "gallery"
 
-        <p className="text-slate-400">
-          Loading event...
-        </p>
-
-
-      </main>
-
-    );
-
-
-  }
+    ) || [];
 
 
 
@@ -124,63 +395,15 @@ export default function EventDetail() {
 
 
 
-  if(error || !event){
+    const highlights =
 
+    event.media?.filter(
 
-    return (
+        (item:any)=>
 
-      <main
-        className="
-          min-h-screen
-          flex
-          items-center
-          justify-center
-          p-8
-        "
-      >
+        item.type === "highlight"
 
-        <div
-          className="
-            glass
-            rounded-3xl
-            p-10
-            text-center
-          "
-        >
-
-          <h1
-            className="
-              text-3xl
-              font-bold
-            "
-          >
-            Event Not Found
-          </h1>
-
-
-          <button
-            onClick={()=>router.back()}
-            className="
-              mt-6
-              rounded-full
-              bg-white/10
-              px-6
-              py-3
-            "
-          >
-            ← Back
-          </button>
-
-
-        </div>
-
-
-      </main>
-
-    );
-
-
-  }
+    ) || [];
 
 
 
@@ -190,426 +413,571 @@ export default function EventDetail() {
 
 
 
-  const gallery = event.media?.filter(
-    (item:any)=>item.type === "gallery"
-  ) || [];
+    return(
 
 
-
-  const highlights = event.media?.filter(
-    (item:any)=>item.type === "highlight"
-  ) || [];
-
-
-
-
-
-
-
-
-
-  return (
-
-    <main
-      className="
+        <main className="
         min-h-screen
         p-8
-        relative
-      "
-    >
-
-
-
-
-      {/* Back Button */}
-
-      <button
-
-        onClick={()=>router.back()}
-
-        className="
-          fixed
-          top-8
-          left-8
-          z-50
-          rounded-full
-          bg-white/10
-          border
-          border-white/20
-          backdrop-blur-xl
-          px-5
-          py-3
-          text-white
-          hover:bg-white/20
-          transition
-        "
-
-      >
-
-        ← Back
-
-      </button>
+        ">
 
 
 
 
 
+            <button
 
+            onClick={()=>router.back()}
 
-
-
-      <div
-        className="
-          max-w-6xl
-          mx-auto
-        "
-      >
-
-
-
-
-
-
-
-
-        {/* Hero */}
-
-
-        <div
-          className="
-            glass
-            rounded-3xl
-            overflow-hidden
-          "
-        >
-
-
-          <div
             className="
-              h-72
-              bg-gradient-to-br
-              from-slate-900
-              to-blue-600
+            fixed
+            top-8
+            left-8
+            z-50
+            px-5
+            py-3
+            rounded-full
+            bg-white/10
+            border
+            border-white/20
             "
-          >
+
+            >
+
+                ← Back
+
+            </button>
 
 
-            {
-              event.thumbnail && (
 
-                <img
 
-                  src={event.thumbnail}
 
-                  alt={event.title}
 
-                  className="
+
+
+
+            <div className="
+            max-w-7xl
+            mx-auto
+            space-y-12
+            ">
+
+
+
+
+
+
+
+
+
+                {/* EVENT HEADER */}
+
+
+                <section className="
+                glass
+                rounded-3xl
+                overflow-hidden
+                ">
+
+
+
+
+
+                    <div className="
+                    h-96
+                    bg-black/20
+                    ">
+
+
+                    {
+
+                    event.thumbnail &&
+
+
+                    <img
+
+                    src={
+                        imageUrl(
+                            event.thumbnail
+                        )
+                    }
+
+
+                    alt="event"
+
+
+                    className="
                     w-full
                     h-full
                     object-cover
-                  "
+                    "
 
-                />
-
-              )
-            }
+                    />
 
 
-          </div>
+                    }
 
 
 
-
-
-          <div className="p-8">
-
-
-            <h1
-              className="
-                text-4xl
-                font-bold
-              "
-            >
-              {event.title}
-            </h1>
-
-
-
-
-            <p
-              className="
-                mt-3
-                text-slate-400
-                text-lg
-              "
-            >
-              {event.name}
-            </p>
+                    </div>
 
 
 
 
 
-            <div
-              className="
-                mt-5
-                inline-flex
-                rounded-full
-                bg-blue-500/20
-                px-4
-                py-2
-                text-blue-300
-              "
-            >
 
-              📅 {event.date}
+
+
+                    <div className="
+                    p-10
+                    text-center
+                    ">
+
+
+                        <h1 className="
+                        text-5xl
+                        font-bold
+                        ">
+
+
+                            {
+                                event.title ||
+
+                                event.name
+                            }
+
+
+                        </h1>
+
+
+
+
+
+
+
+                        {
+
+                        event.description &&
+
+
+                        <p className="
+                        mt-5
+                        text-slate-400
+                        text-lg
+                        ">
+
+
+                            {event.description}
+
+
+                        </p>
+
+
+                        }
+
+
+
+
+
+
+
+                        <div className="
+                        mt-6
+                        inline-block
+                        px-5
+                        py-2
+                        rounded-full
+                        bg-purple-500/20
+                        text-purple-300
+                        ">
+
+                            📸 Gallery & Live
+
+                        </div>
+
+
+
+
+
+                    </div>
+
+
+
+                </section>
+
+
+
+
+
+
+
+
+
+
+
+
+                {/* GALLERY */}
+
+
+
+                <section>
+
+
+                    <h2 className="
+                    text-3xl
+                    font-bold
+                    mb-6
+                    ">
+
+                    📸 Event Gallery
+
+                    </h2>
+
+
+
+
+
+
+
+                    {
+
+                    gallery.length === 0
+
+
+                    ?
+
+
+                    <div className="
+                    glass
+                    rounded-3xl
+                    p-10
+                    text-center
+                    text-slate-400
+                    ">
+
+                        No gallery uploaded yet
+
+                    </div>
+
+
+
+                    :
+
+
+
+                    <div className="
+                    grid
+                    md:grid-cols-3
+                    gap-6
+                    ">
+
+
+
+                    {
+
+                    gallery.map(
+
+                    (item:any)=>(
+
+
+                        <div
+
+                        key={item.id}
+
+                        className="
+                        aspect-square
+                        rounded-3xl
+                        overflow-hidden
+                        "
+
+                        >
+
+
+
+                            <img
+
+                            src={
+
+                                imageUrl(
+
+                                    item.url
+
+                                )
+
+                            }
+
+
+                            alt="gallery"
+
+
+                            className="
+                            w-full
+                            h-full
+                            object-cover
+                            hover:scale-105
+                            transition
+                            "
+
+                            />
+
+
+
+                        </div>
+
+
+                    )
+
+
+                    )
+
+                    }
+
+
+
+                    </div>
+
+
+                    }
+
+
+
+
+                </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                {/* HIGHLIGHT */}
+
+
+
+                <section>
+
+
+                    <h2 className="
+                    text-3xl
+                    font-bold
+                    mb-6
+                    ">
+
+                    ✨ Event Highlight
+
+                    </h2>
+
+
+
+
+
+
+
+
+                    {
+
+                    highlights.length === 0
+
+
+                    ?
+
+
+                    <div className="
+                    glass
+                    rounded-3xl
+                    p-10
+                    text-center
+                    text-slate-400
+                    ">
+
+
+                        No highlight available
+
+
+                    </div>
+
+
+
+
+
+                    :
+
+
+
+                    <div className="
+                    grid
+                    md:grid-cols-2
+                    gap-6
+                    ">
+
+
+
+
+
+                    {
+
+                    highlights.map(
+
+                    (item:any)=>(
+
+
+
+                        <div
+
+                        key={item.id}
+
+                        className="
+                        glass
+                        rounded-3xl
+                        overflow-hidden
+                        "
+
+                        >
+
+
+
+
+
+
+                            {
+
+                            youtubeThumbnail(item.url)
+
+                            &&
+
+
+                            <img
+
+                            src={
+
+                                youtubeThumbnail(
+
+                                    item.url
+
+                                )
+
+                            }
+
+
+                            className="
+                            w-full
+                            h-56
+                            object-cover
+                            "
+
+                            />
+
+
+                            }
+
+
+
+
+
+
+
+                            <div className="
+                            p-8
+                            ">
+
+
+                                <h3 className="
+                                text-2xl
+                                font-bold
+                                ">
+
+
+                                    {item.title}
+
+
+                                </h3>
+
+
+
+
+
+
+                                <a
+
+                                href={item.url}
+
+                                target="_blank"
+
+                                className="
+                                inline-block
+                                mt-6
+                                px-6
+                                py-3
+                                rounded-full
+                                bg-white/10
+                                "
+
+                                >
+
+                                    ▶ Watch
+
+                                </a>
+
+
+
+
+                            </div>
+
+
+
+
+
+                        </div>
+
+
+
+                    )
+
+                    )
+
+
+                    }
+
+
+
+
+
+                    </div>
+
+
+
+                    }
+
+
+
+
+                </section>
+
+
+
+
+
+
+
+
 
             </div>
 
 
 
-          </div>
 
 
 
-        </div>
+        </main>
 
 
-
-
-
-
-
-
-
-        {/* Gallery */}
-
-
-        {
-          gallery.length > 0 && (
-
-            <section className="mt-12">
-
-
-              <h2
-                className="
-                  text-3xl
-                  font-bold
-                "
-              >
-                📸 Gallery
-              </h2>
-
-
-
-
-
-              <div
-                className="
-                  grid
-                  md:grid-cols-3
-                  gap-6
-                  mt-6
-                "
-              >
-
-
-                {
-                  gallery.map((item:any,index:number)=>(
-
-
-                    <div
-
-                      key={index}
-
-                      className="
-                        aspect-square
-                        rounded-2xl
-                        overflow-hidden
-                        bg-gradient-to-br
-                        from-slate-900
-                        to-blue-600
-                        hover:scale-105
-                        transition
-                      "
-
-                    >
-
-
-                      <img
-
-                        src={item.url}
-
-                        alt={item.title}
-
-                        className="
-                          w-full
-                          h-full
-                          object-cover
-                        "
-
-                      />
-
-
-                    </div>
-
-
-                  ))
-                }
-
-
-              </div>
-
-
-            </section>
-
-
-          )
-        }
-
-
-
-
-
-
-
-
-
-        {/* Highlights */}
-
-
-        {
-          highlights.length > 0 && (
-
-
-            <section
-              className="
-                mt-12
-                pb-10
-              "
-            >
-
-
-              <h2
-                className="
-                  text-3xl
-                  font-bold
-                "
-              >
-                ✨ Highlights
-              </h2>
-
-
-
-
-
-              <div
-                className="
-                  grid
-                  md:grid-cols-3
-                  gap-6
-                  mt-6
-                "
-              >
-
-
-                {
-                  highlights.map((item:any,index:number)=>(
-
-
-                    <div
-
-                      key={index}
-
-                      className="
-                        glass
-                        rounded-2xl
-                        p-6
-                        hover:-translate-y-2
-                        transition
-                      "
-
-                    >
-
-
-                      <div className="text-5xl">
-                        🎥
-                      </div>
-
-
-
-
-                      <h3
-                        className="
-                          mt-5
-                          text-xl
-                          font-bold
-                        "
-                      >
-                        {item.title}
-                      </h3>
-
-
-
-
-
-                      <a
-
-                        href={item.url}
-
-                        target="_blank"
-
-                        className="
-                          inline-flex
-                          mt-5
-                          rounded-full
-                          bg-white/10
-                          border
-                          border-white/20
-                          px-5
-                          py-2
-                          hover:bg-white/20
-                          transition
-                        "
-
-                      >
-
-                        ▶ Watch
-
-                      </a>
-
-
-
-
-                    </div>
-
-
-                  ))
-                }
-
-
-              </div>
-
-
-
-            </section>
-
-
-          )
-        }
-
-
-
-
-
-
-      </div>
-
-
-
-    </main>
-
-  );
+    );
 
 
 }

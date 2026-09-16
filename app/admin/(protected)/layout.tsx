@@ -1,11 +1,21 @@
 "use client";
 
+
 import Link from "next/link";
 
 import {
     usePathname,
     useRouter
 } from "next/navigation";
+
+
+import {
+    useEffect,
+    useState
+} from "react";
+
+
+
 
 
 
@@ -22,20 +32,21 @@ export default function AdminLayout({
 }){
 
 
+
+    const router = useRouter();
+
+
     const pathname =
     usePathname();
 
 
 
-    const router =
-    useRouter();
 
 
+    const [checking,setChecking] =
+    useState(true);
 
 
-
-    const isLoginPage =
-    pathname === "/admin/login";
 
 
 
@@ -46,10 +57,12 @@ export default function AdminLayout({
     const menus = [
 
 
+
         {
             name:"Dashboard",
             path:"/admin"
         },
+
 
 
         {
@@ -58,37 +71,96 @@ export default function AdminLayout({
         },
 
 
+
+        {
+            name:"Manage Event",
+            path:"/admin/events/manage"
+        },
+
+
+
         {
             name:"Graduates",
             path:"/admin/graduates"
         },
 
 
+
         {
             name:"Upload Photo",
-            path:"/admin/photos/upload"
+            path:"/admin/photos"
         },
+
 
 
         {
             name:"Bulk Photo Upload",
             path:"/admin/photos/bulk"
-        },
-
-
-        {
-            name:"Manage Photos",
-            path:"/admin/photos"
-        },
-
-
-        {
-            name:"Reports",
-            path:"/admin/reports"
         }
 
 
+
     ];
+
+
+
+
+
+
+
+
+
+    useEffect(()=>{
+
+
+        checkSession();
+
+
+    },[]);
+
+
+
+
+
+
+
+
+
+    const checkSession = ()=>{
+
+
+        const token =
+        localStorage.getItem(
+            "token"
+        );
+
+
+
+
+
+        if(!token){
+
+
+            router.replace(
+                "/admin/login"
+            );
+
+
+            return;
+
+
+        }
+
+
+
+
+
+        setChecking(false);
+
+
+    };
+
+
 
 
 
@@ -104,7 +176,7 @@ export default function AdminLayout({
         );
 
 
-        router.push(
+        router.replace(
             "/admin/login"
         );
 
@@ -119,18 +191,27 @@ export default function AdminLayout({
 
 
 
-    // LOGIN TANPA SIDEBAR
 
-    if(isLoginPage){
+
+
+    if(checking){
 
 
         return(
 
-            <main className="
-            min-h-screen
-            ">
+            <main
 
-                {children}
+            className="
+            min-h-screen
+            flex
+            items-center
+            justify-center
+            "
+
+            >
+
+                Checking session...
+
 
             </main>
 
@@ -147,18 +228,34 @@ export default function AdminLayout({
 
 
 
+
+
+
     return(
 
 
-        <div className="
+        <div
+
+        className="
         min-h-screen
         flex
-        ">
+        "
+
+        >
 
 
 
 
-            <aside className="
+
+
+
+            {/* SIDEBAR */}
+
+
+
+            <aside
+
+            className="
             w-72
             min-h-screen
             glass
@@ -167,7 +264,10 @@ export default function AdminLayout({
             p-6
             flex
             flex-col
-            ">
+            "
+
+            >
+
 
 
 
@@ -175,25 +275,39 @@ export default function AdminLayout({
                 <div>
 
 
-                    <h1 className="
+
+                    <h1
+
+                    className="
                     text-3xl
                     font-bold
                     mb-2
-                    ">
+                    "
+
+                    >
 
                         Pandawa CMS
+
 
                     </h1>
 
 
 
-                    <p className="
+
+
+
+                    <p
+
+                    className="
                     text-sm
                     text-slate-400
                     mb-10
-                    ">
+                    "
+
+                    >
 
                         Graduation Management
+
 
                     </p>
 
@@ -203,13 +317,26 @@ export default function AdminLayout({
 
 
 
-                    <nav className="
+
+
+                    <nav
+
+                    className="
                     space-y-3
-                    ">
+                    "
+
+                    >
+
+
+
 
 
                     {
-                        menus.map((item)=>(
+
+                        menus.map(
+
+                            (item)=>(
+
 
 
                             <Link
@@ -217,6 +344,8 @@ export default function AdminLayout({
                             key={item.path}
 
                             href={item.path}
+
+
 
                             className={`
 
@@ -228,34 +357,54 @@ export default function AdminLayout({
 
                             rounded-xl
 
+                            transition
+
 
                             ${
-                                pathname === item.path
 
-                                ?
+                            pathname === item.path ||
 
-                                "bg-white/20 text-white"
+                            pathname.startsWith(
+                                item.path + "/"
+                            )
 
-                                :
+                            ?
 
-                                "text-slate-400 hover:bg-white/10"
+                            "bg-white/20 text-white"
+
+                            :
+
+                            "text-slate-400 hover:bg-white/10"
 
                             }
 
+
                             `}
+
 
                             >
 
                                 {item.name}
 
+
                             </Link>
 
 
-                        ))
+
+                            )
+
+                        )
+
                     }
 
 
+
+
+
+
+
                     </nav>
+
 
 
 
@@ -269,27 +418,53 @@ export default function AdminLayout({
 
 
 
+
+
+
+
+
+
+
+
                 <button
 
                 onClick={logout}
 
                 className="
+
                 mt-auto
+
                 w-full
+
                 rounded-xl
+
                 px-5
+
                 py-3
+
                 bg-red-500/20
+
                 border
+
                 border-red-400/30
+
                 text-red-300
+
+                hover:bg-red-500/30
+
                 "
 
                 >
 
+
                     Logout
 
+
                 </button>
+
+
+
+
 
 
 
@@ -307,14 +482,32 @@ export default function AdminLayout({
 
 
 
-            <main className="
+
+
+
+
+
+
+            <main
+
+            className="
+
             flex-1
+
             p-8
-            ">
+
+            "
+
+            >
+
 
                 {children}
 
+
             </main>
+
+
+
 
 
 
