@@ -1,6 +1,7 @@
 "use client";
 
 import {
+    Suspense,
     useEffect,
     useState
 } from "react";
@@ -19,7 +20,7 @@ type GraduateOption = {
 };
 
 
-export default function Search(){
+function SearchContent(){
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -595,5 +596,39 @@ export default function Search(){
             </div>
 
         </main>
+    );
+}
+
+export default function Search(){
+
+    return(
+
+        <Suspense
+            fallback={
+
+                <main
+                    className="
+                    min-h-screen
+                    flex
+                    items-center
+                    justify-center
+                    "
+                >
+
+                    <p
+                        className="
+                        text-slate-400
+                        "
+                    >
+                        Loading...
+                    </p>
+
+                </main>
+            }
+        >
+
+            <SearchContent/>
+
+        </Suspense>
     );
 }
