@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Solary — Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-page:#e7e6e9;
+  --bg-app:#0c0c0e;
+  --bg-card:#161519;
+  --bg-card-2:#1c1b20;
+  --bg-input:#201f25;
+  --border:#2a2930;
+  --border-soft:#232228;
+  --text-hi:#ffffff;
+  --text-mid:#a9a8b0;
+  --text-low:#727178;
+  --blue:#3f66f1;
+  --blue-soft:rgba(63,102,241,0.18);
+  --orange:#f2994a;
+  --green:#3ddc84;
+  --radius-xl:26px;
+  --radius-lg:18px;
+  --radius-md:13px;
+  --radius-sm:9px;
+  --radius-pill:999px;
+  box-sizing:border-box;
+}
+*{box-sizing:inherit;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg-page);
+  font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:28px 16px;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:#3a3940;border-radius:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+/* ===== Browser chrome frame ===== */
+.browser{
+  width:100%;max-width:1600px;
+  background:#141316;
+  border-radius:20px;
+  box-shadow:0 40px 90px -30px rgba(0,0,0,0.45);
+  overflow:hidden;
+}
+.chrome-bar{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;background:#141316;
+}
+.traffic{display:flex;gap:8px;flex-shrink:0;}
+.traffic span{width:12px;height:12px;border-radius:50%;}
+.traffic .r{background:#ff5f57;}
+.traffic .y{background:#febc2e;}
+.traffic .g{background:#28c840;}
+.chrome-icon{width:30px;height:30px;border-radius:8px;background:#1e1d22;display:flex;align-items:center;justify-content:center;color:#8a8990;flex-shrink:0;}
+.chrome-icon svg{width:14px;height:14px;}
+.chrome-nav{display:flex;gap:4px;flex-shrink:0;}
+.addr-bar{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:#1e1d22;border-radius:var(--radius-pill);
+  padding:9px 16px;color:var(--text-mid);font-size:13px;max-width:600px;margin:0 auto;
+}
+.addr-bar svg{width:13px;height:13px;flex-shrink:0;}
+.chrome-actions{display:flex;gap:14px;color:#8a8990;flex-shrink:0;}
+.chrome-actions svg{width:16px;height:16px;}
+
+/* ===== App shell ===== */
+.app{display:flex;background:var(--bg-app);min-height:760px;}
+
+.sidebar{
+  width:230px;flex-shrink:0;
+  padding:26px 20px;
+  display:flex;flex-direction:column;
+  position:relative;z-index:5;
+}
+.brand{font-size:21px;font-weight:800;letter-spacing:-0.01em;margin-bottom:34px;color:var(--text-hi);}
+
+.nav{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;border-radius:var(--radius-md);
+  color:var(--text-mid);font-weight:600;font-size:14.5px;
+}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;}
+.nav-item:hover{color:var(--text-hi);}
+.nav-item.active{
+  background:var(--blue);
+  color:#fff;
+  box-shadow:0 10px 22px -10px rgba(63,102,241,0.7);
+}
+
+.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px;}
+.sidebar-user{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;margin-top:14px;
+  border-top:1px solid var(--border-soft);padding-top:20px;
+}
+.sidebar-user img{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.sidebar-user span{font-size:14px;font-weight:600;color:var(--text-hi);}
+
+/* ===== Main content ===== */
+.main{flex:1;min-width:0;position:relative;}
+
+.hero-bg{
+  position:absolute;top:0;left:0;right:0;height:230px;z-index:0;
+  background:
+    linear-gradient(120deg, rgba(63,73,140,0.55) 0%, rgba(30,25,35,0.1) 45%, rgba(150,79,38,0.55) 100%);
+  filter:blur(0px);
+}
+.hero-bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size:3px 3px;
+  mix-blend-mode:overlay;
+}
+
+.content{position:relative;z-index:1;padding:30px 32px 40px;}
+
+.page-title{font-size:26px;font-weight:700;color:var(--text-hi);margin-bottom:22px;}
+
+.grid-top{display:grid;grid-template-columns:1.7fr 1fr;gap:22px;margin-bottom:22px;align-items:stretch;}
+
+.card{
+  background:var(--bg-card);
+  border:1px solid var(--border-soft);
+  border-radius:var(--radius-xl);
+  padding:24px;
+}
+
+/* ---- Solar Panel Monitoring ---- */
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.panel-head h3{font-size:19px;font-weight:700;color:var(--text-hi);}
+.dropdown-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg-input);border:1px solid var(--border);
+  border-radius:var(--radius-pill);padding:8px 16px;
+  font-size:13.5px;font-weight:600;color:var(--text-hi);
+}
+.dropdown-chip svg{width:14px;height:14px;color:var(--text-low);}
+
+.monitor-grid{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:14px;}
+.monitor-left{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.stat-box{
+  background:var(--bg-card-2);border:1px solid var(--border-soft);
+  border-radius:var(--radius-lg);padding:16px;
+}
+.stat-box .lbl{font-size:13px;color:var(--text-low);font-weight:600;margin-bottom:10px;}
+.stat-box .val{font-size:24px;font-weight:800;color:var(--text-hi);}
+.stat-box .val small{font-size:12px;font-weight:600;color:var(--text-low);margin-left:2px;}
+.stat-box.wide{grid-column:1 / -1;}
+.pos-row{display:flex;align-items:center;gap:8px;}
+.pos-badge{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;color:var(--green);}
+.pos-badge svg{width:12px;height:12px;}
+
+.panel-visual{
+  background:var(--bg-card-2);border:1px solid var(--border-soft);
+  border-radius:var(--radius-lg);padding:16px;
+  display:flex;flex-direction:column;
+}
+.panel-select{
+  display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+  background:var(--bg-input);border:1px solid var(--border);
+  border-radius:var(--radius-pill);padding:7px 14px;
+  font-size:12.5px;font-weight:600;margin-bottom:16px;
+}
+.panel-select svg{width:12px;height:12px;color:var(--text-low);}
+.panel-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.panel-img-wrap svg{width:100%;max-width:220px;height:auto;}
+.panel-caption .lbl{font-size:13px;color:var(--text-low);font-weight:600;margin-bottom:4px;}
+.panel-caption .val{font-size:20px;font-weight:800;color:var(--text-hi);}
+
+/* ---- Monthly Generation ---- */
+.mg-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px;}
+.mg-head h3{font-size:19px;font-weight:700;color:var(--text-hi);}
+.mg-total{display:flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;color:var(--text-hi);}
+.mg-total svg{width:14px;height:14px;color:var(--orange);}
+.mg-sub{font-size:12.5px;color:var(--text-low);margin-bottom:18px;}
+
+.month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
+.month-card{
+  background:var(--bg-card-2);border:1px solid var(--border-soft);
+  border-radius:var(--radius-lg);padding:14px 10px;text-align:center;
+}
+.month-card.active{background:var(--blue);border-color:var(--blue);}
+.month-card .m-name{font-size:13px;font-weight:700;color:var(--text-mid);margin-bottom:10px;}
+.month-card.active .m-name{color:#fff;}
+.month-card .m-icon{width:32px;height:32px;margin:0 auto 10px;color:var(--text-low);}
+.month-card.active .m-icon{color:#fff;}
+.month-card .m-icon svg{width:100%;height:100%;}
+.month-card .m-val{font-size:12.5px;font-weight:700;color:var(--text-mid);}
+.month-card.active .m-val{color:#fff;}
+
+.mg-stats{display:flex;flex-direction:column;gap:14px;}
+.mg-stat-row{display:flex;align-items:center;justify-content:space-between;font-size:14px;}
+.mg-stat-row .k{color:var(--text-low);font-weight:600;}
+.mg-stat-row .v{color:var(--text-hi);font-weight:700;}
+
+/* ---- Bottom grid ---- */
+.grid-bottom{display:grid;grid-template-columns:1.7fr 1fr;gap:22px;}
+
+.chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px;}
+.chart-head h3{font-size:19px;font-weight:700;color:var(--text-hi);}
+.chart-badge{display:flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;color:var(--text-hi);}
+.chart-badge svg{width:14px;height:14px;color:var(--orange);}
+.chart-sub{font-size:12.5px;color:var(--text-low);margin-bottom:18px;}
+
+.chart-wrap{position:relative;height:280px;display:flex;}
+.chart-y{display:flex;flex-direction:column;justify-content:space-between;padding:0 10px 22px 0;font-size:12px;color:var(--text-low);text-align:right;}
+.chart-svg-wrap{flex:1;position:relative;}
+.chart-svg-wrap svg{width:100%;height:calc(100% - 22px);overflow:visible;}
+.chart-x{display:flex;justify-content:space-between;padding-top:8px;font-size:12px;color:var(--text-low);}
+
+.legend-row{display:flex;gap:26px;margin-top:16px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-mid);font-weight:600;}
+.legend-line{width:20px;height:3px;border-radius:2px;}
+.legend-line.orange{background:var(--orange);}
+.legend-line.blue{background:var(--blue);}
+
+/* ---- Solar Panel Points ---- */
+.points-head h3{font-size:19px;font-weight:700;color:var(--text-hi);margin-bottom:18px;}
+.point-item{
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg-card-2);border:1px solid var(--border-soft);
+  border-radius:var(--radius-lg);padding:14px;margin-bottom:12px;
+}
+.point-item:last-child{margin-bottom:0;}
+.point-thumb{
+  width:52px;height:52px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,#1c2b4a,#2c3e63);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.point-thumb svg{width:70%;height:70%;}
+.point-info{flex:1;min-width:0;}
+.point-info h4{font-size:15px;font-weight:700;color:var(--text-hi);margin-bottom:3px;}
+.point-info p{font-size:12.5px;color:var(--text-low);}
+.point-info p b{font-weight:700;}
+.point-info p .active{color:var(--green);}
+.point-info p .charging{color:var(--orange);}
+.point-info p .inactive{color:#e05a5a;}
+.point-kwh{display:flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;color:var(--text-hi);flex-shrink:0;white-space:nowrap;}
+.point-kwh svg{width:13px;height:13px;color:var(--orange);}
+
+/* ===== Responsive ===== */
+@media (max-width:1180px){
+  .grid-top{grid-template-columns:1fr;}
+  .grid-bottom{grid-template-columns:1fr;}
+  .monitor-grid{grid-template-columns:1fr 1fr;}
+  .panel-visual{grid-column:1 / -1;}
+}
+@media (max-width:900px){
+  .app{flex-direction:column;}
+  .sidebar{
+    width:100%;flex-direction:row;align-items:center;padding:16px 20px;
+    overflow-x:auto;
+  }
+  .brand{margin-bottom:0;margin-right:18px;flex-shrink:0;}
+  .nav{flex-direction:row;flex-shrink:0;}
+  .nav-item span{display:none;}
+  .sidebar-bottom{display:none;}
+  .hero-bg{height:160px;}
+  .month-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:640px){
+  body{padding:0;}
+  .browser{border-radius:0;}
+  .content{padding:20px 16px 32px;}
+  .monitor-left{grid-template-columns:1fr 1fr;}
+  .monitor-grid{grid-template-columns:1fr;}
+  .card{padding:18px;}
+  .chart-y{display:none;}
+  .chart-wrap{height:220px;}
+  .month-grid{grid-template-columns:repeat(2,1fr);}
+  .addr-bar span.addr-text{display:none;}
+  .chrome-actions{gap:8px;}
+}
+</style>
+</head>
+<body>
+
+<div class="browser">
+  <div class="chrome-bar">
+    <div class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+    <div class="chrome-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2.5"/><line x1="9.5" y1="4" x2="9.5" y2="20"/></svg></div>
+    <div class="chrome-nav">
+      <div class="chrome-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <div class="chrome-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div class="addr-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      <span class="addr-text">https://solary.com/dashboard</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </div>
+    <div class="chrome-actions">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="13" height="13" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2"/></svg>
+    </div>
+  </div>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Solary</div>
+      <ul class="nav">
+        <li><a href="#" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Overview</span></a></li>
+        <li><a href="#" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="14 3 14 9 20 9"/></svg><span>Analisyst</span></a></li>
+        <li><a href="#" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Performance</span></a></li>
+        <li><a href="#" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><line x1="9" y1="12" x2="15" y2="12"/></svg><span>Report</span></a></li>
+        <li><a href="#" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H4v-5"/><path d="M20 7h-7l-2-2H4"/><path d="M20 7v10a2 2 0 0 1-2 2H9"/></svg><span>System</span></a></li>
+        <li><a href="#" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H4v-5"/><path d="M20 7h-7l-2-2H4"/><path d="M20 7v10a2 2 0 0 1-2 2H9"/></svg><span>My Site</span></a></li>
+      </ul>
+
+      <div class="sidebar-bottom">
+        <a href="#" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Report</span></a>
+        <a href="#" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></a>
+        <div class="sidebar-user">
+          <img src="https://i.pravatar.cc/80?img=68" alt="Foto profil Faza Dzikrulloh">
+          <span>Faza Dzikrulloh</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="hero-bg"></div>
+      <main class="content">
+        <h1 class="page-title">Overview</h1>
+
+        <section class="grid-top">
+          <!-- Solar Panel Monitoring -->
+          <div class="card">
+            <div class="panel-head">
+              <h3>Solar Panel Monitoring</h3>
+              <div class="dropdown-chip">Rumah Sasana <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg></div>
+            </div>
+
+            <div class="monitor-grid">
+              <div class="monitor-left">
+                <div class="stat-box"><div class="lbl">Status</div><div class="val">Active</div></div>
+                <div class="stat-box"><div class="lbl">Capacity</div><div class="val">320<small>kWh</small></div></div>
+                <div class="stat-box"><div class="lbl">Total Yeld</div><div class="val">190<small>kWh</small></div></div>
+                <div class="stat-box"><div class="lbl">Consumption</div><div class="val">250<small>kWh</small></div></div>
+                <div class="stat-box wide"><div class="lbl">Total Charging</div><div class="val">100,90<small>kWh</small></div></div>
+                <div class="stat-box wide">
+                  <div class="lbl">Real Time Power Usage</div>
+                  <div class="pos-row">
+                    <span class="val">100,90<small>kWh</small></span>
+                    <span class="pos-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>+22%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel-visual">
+                <div class="panel-select">Panel 1 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg></div>
+                <div class="panel-img-wrap">
+                  <svg viewBox="0 0 220 170">
+                    <defs>
+                      <linearGradient id="pv" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#2b3a5c"/>
+                        <stop offset="100%" stop-color="#131a2b"/>
+                      </linearGradient>
+                    </defs>
+                    <g transform="translate(20,55) rotate(-8)">
+                      <rect x="0" y="0" width="150" height="95" rx="4" fill="#d9d9d9"/>
+                      <rect x="6" y="6" width="138" height="83" rx="2" fill="url(#pv)"/>
+                      <g stroke="#3a4a70" stroke-width="1">
+                        <line x1="6" y1="27" x2="144" y2="27"/><line x1="6" y1="48" x2="144" y2="48"/><line x1="6" y1="69" x2="144" y2="69"/>
+                        <line x1="41" y1="6" x2="41" y2="89"/><line x1="76" y1="6" x2="76" y2="89"/><line x1="111" y1="6" x2="111" y2="89"/>
+                      </g>
+                    </g>
+                    <g transform="translate(45,35) rotate(-8)">
+                      <rect x="0" y="0" width="150" height="95" rx="4" fill="#e8e8e8"/>
+                      <rect x="6" y="6" width="138" height="83" rx="2" fill="url(#pv)"/>
+                      <g stroke="#3a4a70" stroke-width="1">
+                        <line x1="6" y1="27" x2="144" y2="27"/><line x1="6" y1="48" x2="144" y2="48"/><line x1="6" y1="69" x2="144" y2="69"/>
+                        <line x1="41" y1="6" x2="41" y2="89"/><line x1="76" y1="6" x2="76" y2="89"/><line x1="111" y1="6" x2="111" y2="89"/>
+                      </g>
+                    </g>
+                  </svg>
+                </div>
+                <div class="panel-caption"><div class="lbl">Total Panel</div><div class="val">87 Panel</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly Generation -->
+          <div class="card">
+            <div class="mg-head">
+              <h3>Monthly Generation</h3>
+              <div class="mg-total"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>300kWh</div>
+            </div>
+            <div class="mg-sub">Updated 10 minutes ago</div>
+
+            <div class="month-grid">
+              <div class="month-card active">
+                <div class="m-name">Sept</div>
+                <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4.5"/><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.2" y1="19.8" x2="6" y2="18"/><line x1="18" y1="6" x2="19.8" y2="4.2"/></svg></div>
+                <div class="m-val">280 kWh</div>
+              </div>
+              <div class="month-card">
+                <div class="m-name">Oct</div>
+                <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.5 19H9a5 5 0 1 1 1.4-9.8A6 6 0 0 1 22 12.5a4.5 4.5 0 0 1-4.5 6.5z"/></svg></div>
+                <div class="m-val">301 kWh</div>
+              </div>
+              <div class="month-card">
+                <div class="m-name">Nov</div>
+                <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.5 19H9a5 5 0 1 1 1.4-9.8A6 6 0 0 1 22 12.5a4.5 4.5 0 0 1-4.5 6.5z"/><circle cx="6" cy="16" r="2.2"/></svg></div>
+                <div class="m-val">189 kWh</div>
+              </div>
+              <div class="month-card">
+                <div class="m-name">Dec</div>
+                <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.5 15.5H9a5 5 0 1 1 1.4-9.8A6 6 0 0 1 22 9a4.5 4.5 0 0 1-4.5 6.5z"/><line x1="8" y1="19" x2="8" y2="21"/><line x1="12" y1="19" x2="12" y2="21.5"/><path d="M12 19l1-2"/></svg></div>
+                <div class="m-val">243 kWh</div>
+              </div>
+            </div>
+
+            <div class="mg-stats">
+              <div class="mg-stat-row"><span class="k">Maximal Used</span><span class="v">October 301 kWh</span></div>
+              <div class="mg-stat-row"><span class="k">Minimal Used</span><span class="v">November 189 kWh</span></div>
+              <div class="mg-stat-row"><span class="k">Total Used</span><span class="v">318 kWh</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid-bottom">
+          <!-- Energy Produced Chart -->
+          <div class="card">
+            <div class="chart-head">
+              <h3>Energy Produced</h3>
+              <div class="chart-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>300kWh</div>
+            </div>
+            <div class="chart-sub">Updated 10 minutes ago</div>
+            <div class="dropdown-chip" style="position:relative;top:-52px;float:right;margin-bottom:-32px;">Monthly <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg></div>
+
+            <div class="chart-wrap">
+              <div class="chart-y">
+                <span>300</span><span>250</span><span>200</span><span>150</span><span>100</span><span>50</span><span>0</span>
+              </div>
+              <div class="chart-svg-wrap">
+                <svg viewBox="0 0 700 230" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="gO" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#f2994a" stop-opacity="0.35"/>
+                      <stop offset="100%" stop-color="#f2994a" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <g stroke="#232228" stroke-width="1">
+                    <line x1="0" y1="5" x2="700" y2="5"/>
+                    <line x1="0" y1="42" x2="700" y2="42"/>
+                    <line x1="0" y1="79" x2="700" y2="79"/>
+                    <line x1="0" y1="116" x2="700" y2="116"/>
+                    <line x1="0" y1="153" x2="700" y2="153"/>
+                    <line x1="0" y1="190" x2="700" y2="190"/>
+                  </g>
+                  <path d="M0,150 C40,120 60,100 100,110 C140,120 150,60 190,55 C220,52 240,110 270,120 C300,130 320,80 360,75 C400,70 420,140 460,145 C500,150 520,90 560,85 C600,80 620,130 660,125 C680,122 690,100 700,95 L700,220 L0,220 Z" fill="url(#gO)"/>
+                  <path d="M0,150 C40,120 60,100 100,110 C140,120 150,60 190,55 C220,52 240,110 270,120 C300,130 320,80 360,75 C400,70 420,140 460,145 C500,150 520,90 560,85 C600,80 620,130 660,125 C680,122 690,100 700,95" fill="none" stroke="#f2994a" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M0,175 C30,150 50,190 80,170 C110,150 130,175 160,140 C190,105 210,95 240,90 C260,88 270,130 290,150 C310,170 330,190 360,185 C390,180 400,140 430,120 C460,100 480,90 510,110 C540,130 560,175 590,180 C610,183 630,160 650,150 C670,140 685,145 700,155" fill="none" stroke="#3f66f1" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="chart-x" style="padding-left:34px;">
+              <span>Jun</span><span>Jul</span><span>Aug</span><span>Sept</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span>
+            </div>
+
+            <div class="legend-row">
+              <div class="legend-item"><span class="legend-line orange"></span>Energy Produced</div>
+              <div class="legend-item"><span class="legend-line blue"></span>Energy Consumption</div>
+            </div>
+          </div>
+
+          <!-- Solar Panel Points -->
+          <div class="card">
+            <div class="points-head"><h3>Solar Panel Points</h3></div>
+
+            <div class="point-item">
+              <div class="point-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="#8fa3d6" stroke-width="1.6"><rect x="3" y="4" width="18" height="14" rx="1.5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="14" x2="21" y2="14"/><line x1="9" y1="4" x2="9" y2="18"/><line x1="15" y1="4" x2="15" y2="18"/></svg></div>
+              <div class="point-info"><h4>Rumah Sasana</h4><p>Capacity 320 kWh - <b class="active">Active</b></p></div>
+              <div class="point-kwh"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>292,8 kWh</div>
+            </div>
+
+            <div class="point-item">
+              <div class="point-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="#8fa3d6" stroke-width="1.6"><rect x="3" y="4" width="18" height="14" rx="1.5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="14" x2="21" y2="14"/><line x1="9" y1="4" x2="9" y2="18"/><line x1="15" y1="4" x2="15" y2="18"/></svg></div>
+              <div class="point-info"><h4>Sans Brothers</h4><p>Capacity 920 kWh - <b class="charging">Charging</b></p></div>
+              <div class="point-kwh"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>202,8 kWh</div>
+            </div>
+
+            <div class="point-item">
+              <div class="point-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="#8fa3d6" stroke-width="1.6"><rect x="3" y="4" width="18" height="14" rx="1.5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="14" x2="21" y2="14"/><line x1="9" y1="4" x2="9" y2="18"/><line x1="15" y1="4" x2="15" y2="18"/></svg></div>
+              <div class="point-info"><h4>Perum Gulon</h4><p>Capacity 1,000kWh - <b class="inactive">Inactive</b></p></div>
+              <div class="point-kwh"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>202,8 kWh</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,108 +1,216 @@
 @import "tailwindcss";
 
+/* ============================================================
+   PANDAWA HUB — DESIGN TOKENS
+   Style reference: solary-dashboard.html
+   ============================================================ */
 
-:root {
-  --background:#050505;
+@theme {
+  /* Secondary / body font (Plus Jakarta Sans) */
+  --font-sans: var(--font-jakarta), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+
+  /* Primary / display font (Momo Trust Display) */
+  --font-display: var(--font-momo), var(--font-jakarta), -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Surfaces */
+  --color-page: #e7e6e9;
+  --color-app: #0c0c0e;
+  --color-card: #161519;
+  --color-card-2: #1c1b20;
+  --color-field: #201f25;
+
+  /* Borders */
+  --color-line: #2a2930;
+  --color-line-soft: #232228;
+
+  /* Text */
+  --color-hi: #ffffff;
+  --color-mid: #a9a8b0;
+  --color-low: #727178;
+
+  /* Brand & accents */
+  --color-brand: #3f66f1;
+  --color-brand-soft: rgba(63, 102, 241, 0.18);
+  --color-accent: #f2994a;
+  --color-success: #3ddc84;
+  --color-danger: #e05a5a;
+
+  /* Radii */
+  --radius-sm: 9px;
+  --radius-md: 13px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
 }
 
+/* ============================================================
+   BASE
+   ============================================================ */
 
-*{
-  box-sizing:border-box;
+* {
+  box-sizing: border-box;
 }
 
+html,
+body {
+  min-height: 100%;
+}
 
-body{
+body {
+  background: var(--color-app);
+  color: var(--color-hi);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
 
-  min-height:100vh;
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-  color:white;
+/* Primary font applies to headings by default.
+   Momo Trust Display only ships weight 400, so heavier
+   heading weights are synthesized by the browser. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
+  font-family: var(--font-display);
+}
 
-  background:
-  radial-gradient(
-    circle at top,
-    #123b88,
-    #050505 55%
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3940;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+
+/* Hero gradient band used across page headers (reference .hero-bg) */
+.app-hero {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 230px;
+  background: linear-gradient(
+    120deg,
+    rgba(63, 73, 140, 0.55) 0%,
+    rgba(30, 25, 35, 0.1) 45%,
+    rgba(150, 79, 38, 0.55) 100%
   );
-
 }
 
-
-/* glass */
-
-.glass{
-
-background:
-rgba(255,255,255,.08);
-
-border:
-1px solid rgba(255,255,255,.15);
-
-backdrop-filter:
-blur(20px);
-
+.app-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.035) 1px,
+    transparent 1px
+  );
+  background-size: 3px 3px;
+  mix-blend-mode: overlay;
 }
 
-
-/* glow */
-
-.glow{
-
-position:fixed;
-
-width:500px;
-
-height:500px;
-
-background:#0066ff;
-
-filter:blur(150px);
-
-opacity:.35;
-
-top:-150px;
-
-left:50%;
-
-transform:translateX(-50%);
-
+@media (max-width: 899px) {
+  .app-hero {
+    height: 160px;
+  }
 }
 
-
-
-/* animation */
-
-.animate-float{
-
-animation:
-float 5s ease-in-out infinite;
-
+/* Emoji-free fade-in for cards */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-
-@keyframes float{
-
-0%,100%{
-transform:translateY(0)
+.animate-rise {
+  animation: rise 0.4s ease-out both;
 }
 
-50%{
-transform:translateY(-15px)
+/* ============================================================
+   PHOTO MARQUEE (home background)
+   Strips are duplicated 2x, so -50% loops seamlessly.
+   Gap must be padding on items, never flex-gap, to keep the
+   two halves identical in height.
+   ============================================================ */
+
+@keyframes marquee-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
 }
 
+@keyframes marquee-down {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
+.animate-marquee-up {
+  animation: marquee-up var(--marquee-duration, 46s) linear infinite;
+}
 
-.gradient-text{
+.animate-marquee-down {
+  animation: marquee-down var(--marquee-duration, 46s) linear infinite;
+}
 
-background:
-linear-gradient(
-90deg,
-#fff,
-#38bdf8
-);
+/* Keep the hero content readable over the moving photos */
+.app-photo-overlay {
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 50% 50%,
+      rgba(12, 12, 14, 0.96) 0%,
+      rgba(12, 12, 14, 0.86) 45%,
+      rgba(12, 12, 14, 0.72) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(12, 12, 14, 0.9) 0%,
+      rgba(12, 12, 14, 0.7) 40%,
+      rgba(12, 12, 14, 0.95) 100%
+    );
+}
 
--webkit-background-clip:text;
-
-color:transparent;
-
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-up,
+  .animate-marquee-down {
+    animation: none;
+  }
 }

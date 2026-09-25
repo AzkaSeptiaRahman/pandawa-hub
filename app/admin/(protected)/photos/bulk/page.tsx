@@ -1,1619 +1,722 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import {
-    useEffect,
-    useState
-} from "react";
+  PackagePlus,
+  Upload,
+  Copy,
+  Check,
+  CheckCircle2,
+  XCircle,
+  Info,
+  RotateCcw,
+  SkipForward,
+} from "lucide-react";
 
+import Button from "@/components/ui/Button";
+import Select from "@/components/ui/Select";
+import Label from "@/components/ui/Label";
+import Card from "@/components/ui/Card";
+import PageHeader from "@/components/ui/PageHeader";
+import Alert from "@/components/ui/Alert";
 
 type Event = {
-    id: number;
-    name: string;
-    type: string;
+  id: number;
+  name: string;
+  type: string;
 };
-
 
 type GraduateOption = {
-    id?: number;
-    graduation_number?: string;
-    name?: string;
-    faculty: string;
-    study_program?: string;
+  id?: number;
+  graduation_number?: string;
+  name?: string;
+  faculty: string;
+  study_program?: string;
 };
-
 
 type FailedFile = {
-    file: string;
-    reason: string;
+  file: string;
+  reason: string;
 };
-
 
 type SuccessFile = {
-    file: string;
-    graduate_id?: number;
-    graduate?: string;
-    graduation_number?: string;
-    faculty?: string;
-    type?: string;
+  file: string;
+  graduate_id?: number;
+  graduate?: string;
+  graduation_number?: string;
+  faculty?: string;
+  type?: string;
 };
 
+const API = process.env.NEXT_PUBLIC_API_URL;
 
-export default function BulkUpload(){
+export default function BulkUpload() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [graduates, setGraduates] = useState<GraduateOption[]>([]);
 
-    const [events,setEvents] =
-        useState<Event[]>([]);
+  const [eventId, setEventId] = useState("");
+  const [faculty, setFaculty] = useState("");
+  const [file, setFile] = useState<File | null>(null);
 
-    const [graduates,setGraduates] =
-        useState<GraduateOption[]>([]);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [loadingFaculty, setLoadingFaculty] = useState(false);
 
-    const [eventId,setEventId] =
-        useState("");
+  const [failedFiles, setFailedFiles] = useState<FailedFile[]>([]);
+  const [skippedFiles, setSkippedFiles] = useState<FailedFile[]>([]);
+  const [successFiles, setSuccessFiles] = useState<SuccessFile[]>([]);
+  const [hasResult, setHasResult] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-    const [faculty,setFaculty] =
-        useState("");
+  const zipInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [file,setFile] =
-        useState<File | null>(null);
+  // =====================================================
+  // LOAD EVENTS
+  // =====================================================
 
-    const [message,setMessage] =
-        useState("");
+  useEffect(() => {
+    loadEvents();
+  }, []);
 
-    const [loading,setLoading] =
-        useState(false);
+  const loadEvents = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const [loadingFaculty,setLoadingFaculty] =
-        useState(false);
+      const response = await fetch(`${API}/api/admin/events/options`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const [failedFiles,setFailedFiles] =
-        useState<FailedFile[]>([]);
+      const data = await response.json();
 
-    const [successFiles,setSuccessFiles] =
-        useState<SuccessFile[]>([]);
+      if (!response.ok) {
+        setMessage(data.message || "Failed load events");
+        return;
+      }
 
-    const [hasResult,setHasResult] =
-        useState(false);
+      const eventData = Array.isArray(data) ? data : data.events || [];
 
-    const [copied,setCopied] =
-        useState(false);
+      // BULK hanya PERSONAL
+      setEvents(eventData.filter((item: Event) => item.type === "PERSONAL"));
+    } catch (error) {
+      console.error("LOAD EVENTS ERROR:", error);
+      setMessage("Failed load events");
+    }
+  };
 
+  // =====================================================
+  // LOAD GRADUATES BY EVENT
+  // =====================================================
 
-    // =====================================================
-    // LOAD EVENTS
-    // =====================================================
+  const loadGraduates = async (selectedEventId: string) => {
+    if (!selectedEventId) {
+      setGraduates([]);
+      setFaculty("");
+      return;
+    }
 
-    useEffect(()=>{
+    try {
+      setLoadingFaculty(true);
+      setMessage("");
 
-        loadEvents();
+      const token = localStorage.getItem("token");
 
-    },[]);
-
-
-    const loadEvents = async()=>{
-
-        try{
-
-            const token =
-                localStorage.getItem("token");
-
-
-            const response =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/api/admin/events/options`,
-                    {
-                        headers:{
-                            Authorization:
-                                `Bearer ${token}`
-                        }
-                    }
-                );
-
-
-            const data =
-                await response.json();
-
-
-            if(!response.ok){
-
-                setMessage(
-                    data.message ||
-                    "Failed load events"
-                );
-
-                return;
-            }
-
-
-            const eventData =
-                Array.isArray(data)
-                    ? data
-                    : data.events || [];
-
-
-            // BULK hanya PERSONAL
-            setEvents(
-                eventData.filter(
-                    (item:Event)=>
-                        item.type === "PERSONAL"
-                )
-            );
-
-
-        }catch(error){
-
-            console.error(
-                "LOAD EVENTS ERROR:",
-                error
-            );
-
-            setMessage(
-                "Failed load events"
-            );
-
+      const response = await fetch(
+        `${API}/api/admin/graduates/options?eventId=${selectedEventId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-    };
+      const contentType = response.headers.get("content-type");
 
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
 
-    // =====================================================
-    // LOAD GRADUATES BY EVENT
-    // =====================================================
-
-    const loadGraduates = async(
-        selectedEventId:string
-    )=>{
-
-        if(!selectedEventId){
-
-            setGraduates([]);
-            setFaculty("");
-
-            return;
-        }
-
-
-        try{
-
-            setLoadingFaculty(true);
-            setMessage("");
-
-
-            const token =
-                localStorage.getItem("token");
-
-
-            const response =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/api/admin/graduates/options?eventId=${selectedEventId}`,
-                    {
-                        headers:{
-                            Authorization:
-                                `Bearer ${token}`
-                        }
-                    }
-                );
-
-
-            const contentType =
-                response.headers.get(
-                    "content-type"
-                );
-
-
-            if(
-                !contentType ||
-                !contentType.includes(
-                    "application/json"
-                )
-            ){
-
-                const text =
-                    await response.text();
-
-
-                console.error(
-                    "INVALID GRADUATE RESPONSE:",
-                    text
-                );
-
-
-                setGraduates([]);
-
-                setMessage(
-                    "Invalid response when loading faculty"
-                );
-
-                return;
-            }
-
-
-            const data =
-                await response.json();
-
-
-            if(!response.ok){
-
-                setGraduates([]);
-
-                setMessage(
-                    data.message ||
-                    "Failed load faculty"
-                );
-
-                return;
-            }
-
-
-            const graduateData =
-                Array.isArray(data)
-                    ? data
-                    : data.graduates ||
-                      data.options ||
-                      [];
-
-
-            setGraduates(
-                graduateData
-            );
-
-
-            if(
-                graduateData.length === 0
-            ){
-
-                setMessage(
-                    "No graduate data found for this event"
-                );
-
-            }
-
-
-        }catch(error){
-
-            console.error(
-                "LOAD GRADUATES ERROR:",
-                error
-            );
-
-
-            setGraduates([]);
-
-
-            setMessage(
-                "Failed load faculty"
-            );
-
-
-        }finally{
-
-            setLoadingFaculty(false);
-
-        }
-
-    };
-
-
-    // =====================================================
-    // UNIQUE FACULTIES
-    // =====================================================
-
-    const faculties =
-        Array.from(
-            new Set(
-                graduates
-                    .map(
-                        item=>
-                            item.faculty?.trim()
-                    )
-                    .filter(
-                        (item):item is string =>
-                            Boolean(item)
-                    )
-            )
-        ).sort();
-
-
-    // =====================================================
-    // RESET FILE INPUT
-    // =====================================================
-
-    const resetFileInput = ()=>{
-
-        setFile(null);
-
-
-        const input =
-            document.getElementById(
-                "zip"
-            ) as HTMLInputElement | null;
-
-
-        if(input){
-
-            input.value="";
-
-        }
-
-    };
-
-
-    // =====================================================
-    // EVENT CHANGE
-    // =====================================================
-
-    const handleEventChange = (
-        e:React.ChangeEvent<HTMLSelectElement>
-    )=>{
-
-        const selectedId =
-            e.target.value;
-
-
-        setEventId(
-            selectedId
-        );
-
-
-        setFaculty("");
+        console.error("INVALID GRADUATE RESPONSE:", text);
 
         setGraduates([]);
+        setMessage("Invalid response when loading faculty");
+        return;
+      }
 
-        resetFileInput();
+      const data = await response.json();
 
-        setMessage("");
+      if (!response.ok) {
+        setGraduates([]);
+        setMessage(data.message || "Failed load faculty");
+        return;
+      }
 
-        setFailedFiles([]);
+      const graduateData = Array.isArray(data)
+        ? data
+        : data.graduates || data.options || [];
 
-        setSuccessFiles([]);
+      setGraduates(graduateData);
 
-        setHasResult(false);
+      if (graduateData.length === 0) {
+        setMessage("No graduate data found for this event");
+      }
+    } catch (error) {
+      console.error("LOAD GRADUATES ERROR:", error);
+      setGraduates([]);
+      setMessage("Failed load faculty");
+    } finally {
+      setLoadingFaculty(false);
+    }
+  };
 
+  // =====================================================
+  // UNIQUE FACULTIES
+  // =====================================================
+
+  const faculties = Array.from(
+    new Set(
+      graduates
+        .map((item) => item.faculty?.trim())
+        .filter((item): item is string => Boolean(item))
+    )
+  ).sort();
+
+  // =====================================================
+  // RESET FILE INPUT
+  // =====================================================
+
+  const resetFileInput = () => {
+    setFile(null);
+
+    if (zipInputRef.current) {
+      zipInputRef.current.value = "";
+    }
+  };
+
+  // =====================================================
+  // EVENT CHANGE
+  // =====================================================
+
+  const handleEventChange = (selectedId: string) => {
+    setEventId(selectedId);
+    setFaculty("");
+    setGraduates([]);
+
+    resetFileInput();
+
+    setMessage("");
+    setFailedFiles([]);
+    setSkippedFiles([]);
+    setSuccessFiles([]);
+    setHasResult(false);
+    setCopied(false);
+
+    if (selectedId) {
+      loadGraduates(selectedId);
+    }
+  };
+
+  // =====================================================
+  // FACULTY CHANGE
+  // =====================================================
+
+  const handleFacultyChange = (value: string) => {
+    setFaculty(value);
+
+    resetFileInput();
+
+    setMessage("");
+    setFailedFiles([]);
+    setSkippedFiles([]);
+    setSuccessFiles([]);
+    setHasResult(false);
+    setCopied(false);
+  };
+
+  // =====================================================
+  // ZIP CHANGE
+  // =====================================================
+
+  const handleZipChange = (files: FileList) => {
+    const selected = files?.[0];
+
+    if (!selected) {
+      return;
+    }
+
+    if (!selected.name.toLowerCase().endsWith(".zip")) {
+      setFile(null);
+      setMessage("Only ZIP file allowed");
+
+      if (zipInputRef.current) {
+        zipInputRef.current.value = "";
+      }
+
+      return;
+    }
+
+    setFile(selected);
+    setMessage(`Selected: ${selected.name}`);
+  };
+
+  // =====================================================
+  // COPY FAILED FILENAMES
+  // =====================================================
+
+  const copyFailedFilenames = async () => {
+    if (failedFiles.length === 0) {
+      return;
+    }
+
+    const filenames = failedFiles.map((item) => item.file).join("\n");
+
+    try {
+      await navigator.clipboard.writeText(filenames);
+
+      setCopied(true);
+
+      setTimeout(() => {
         setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("COPY ERROR:", error);
+      setMessage("Failed to copy filenames");
+    }
+  };
 
+  // =====================================================
+  // CLEAR RESULT
+  // =====================================================
 
-        if(selectedId){
+  const clearResult = () => {
+    setFailedFiles([]);
+    setSkippedFiles([]);
+    setSkippedFiles([]);
+    setSuccessFiles([]);
+    setHasResult(false);
+    setCopied(false);
+    setMessage("");
+  };
 
-            loadGraduates(
-                selectedId
-            );
+  // =====================================================
+  // UPLOAD
+  // =====================================================
 
-        }
+  const upload = async () => {
+    setMessage("");
+    setCopied(false);
 
-    };
+    if (!eventId) {
+      setMessage("Please select event first");
+      return;
+    }
 
+    if (!faculty) {
+      setMessage("Please select faculty first");
+      return;
+    }
 
-    // =====================================================
-    // FACULTY CHANGE
-    // =====================================================
+    if (!file) {
+      setMessage("Please choose ZIP file");
+      return;
+    }
 
-    const handleFacultyChange = (
-        e:React.ChangeEvent<HTMLSelectElement>
-    )=>{
+    try {
+      setLoading(true);
+      setHasResult(false);
+      setFailedFiles([]);
+      setSkippedFiles([]);
+      setSuccessFiles([]);
 
-        setFaculty(
-            e.target.value
-        );
+      const form = new FormData();
 
+      form.append("event_id", eventId);
+      form.append("faculty", faculty);
+      form.append("file", file);
 
-        resetFileInput();
+      const token = localStorage.getItem("token");
 
-        setMessage("");
+      const response = await fetch(`${API}/api/admin/photos/bulk-upload`, {
+        method: "POST",
 
-        setFailedFiles([]);
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
 
-        setSuccessFiles([]);
+        body: form,
+      });
 
-        setHasResult(false);
+      const contentType = response.headers.get("content-type");
 
-        setCopied(false);
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
 
-    };
+        console.error("NON JSON RESPONSE:", text);
 
+        setMessage(`Server returned invalid response (${response.status})`);
+        return;
+      }
 
-    // =====================================================
-    // ZIP CHANGE
-    // =====================================================
+      const data = await response.json();
 
-    const handleZipChange = (
-        e:React.ChangeEvent<HTMLInputElement>
-    )=>{
+      console.log("BULK RESULT:", data);
 
-        const selected =
-            e.target.files?.[0];
+      if (!response.ok) {
+        setMessage(data.message || "Upload failed");
+        return;
+      }
 
+      const success = Array.isArray(data.success) ? data.success : [];
+      const failed = Array.isArray(data.failed) ? data.failed : [];
+      const skipped = Array.isArray(data.skipped) ? data.skipped : [];
 
-        if(!selected){
+      setSuccessFiles(success);
+      setFailedFiles(failed);
+      setSkippedFiles(skipped);
+      setHasResult(true);
 
-            return;
-
-        }
-
-
-        if(
-            !selected.name
-                .toLowerCase()
-                .endsWith(".zip")
-        ){
-
-            setFile(null);
-
-            setMessage(
-                "Only ZIP file allowed"
-            );
-
-            e.target.value="";
-
-            return;
-
-        }
-
-
-        setFile(
-            selected
-        );
-
-
+      if (failed.length === 0) {
         setMessage(
-            `Selected: ${selected.name}`
+          `Upload completed successfully. ${success.length} file(s) uploaded.`
         );
-
-    };
-
-
-    // =====================================================
-    // COPY FAILED FILENAMES
-    // =====================================================
-
-    const copyFailedFilenames = async()=>{
-
-        if(
-            failedFiles.length === 0
-        ){
-
-            return;
-
-        }
-
-
-        const filenames =
-            failedFiles
-                .map(
-                    item=>item.file
-                )
-                .join("\n");
-
-
-        try{
-
-            await navigator.clipboard.writeText(
-                filenames
-            );
-
-
-            setCopied(true);
-
-
-            setTimeout(()=>{
-
-                setCopied(false);
-
-            },2000);
-
-
-        }catch(error){
-
-            console.error(
-                "COPY ERROR:",
-                error
-            );
-
-
-            setMessage(
-                "Failed to copy filenames"
-            );
-
-        }
-
-    };
-
-
-    // =====================================================
-    // CLEAR RESULT
-    // =====================================================
-
-    const clearResult = ()=>{
-
-        setFailedFiles([]);
-
-        setSuccessFiles([]);
-
-        setHasResult(false);
-
-        setCopied(false);
-
-        setMessage("");
-
-    };
-
-
-    // =====================================================
-    // UPLOAD
-    // =====================================================
-
-    const upload = async()=>{
-
-        setMessage("");
-
-        setCopied(false);
-
-
-        if(!eventId){
-
-            setMessage(
-                "Please select event first"
-            );
-
-            return;
-
-        }
-
-
-        if(!faculty){
-
-            setMessage(
-                "Please select faculty first"
-            );
-
-            return;
-
-        }
-
-
-        if(!file){
-
-            setMessage(
-                "Please choose ZIP file"
-            );
-
-            return;
-
-        }
-
-
-        try{
-
-            setLoading(true);
-
-            setHasResult(false);
-
-            setFailedFiles([]);
-
-            setSuccessFiles([]);
-
-
-            const form =
-                new FormData();
-
-
-            form.append(
-                "event_id",
-                eventId
-            );
-
-
-            form.append(
-                "faculty",
-                faculty
-            );
-
-
-            form.append(
-                "file",
-                file
-            );
-
-
-            const token =
-                localStorage.getItem(
-                    "token"
-                );
-
-
-            const response =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/api/admin/photos/bulk-upload`,
-                    {
-                        method:"POST",
-
-                        headers:{
-                            Authorization:
-                                `Bearer ${token}`
-                        },
-
-                        body:form
-                    }
-                );
-
-
-            const contentType =
-                response.headers.get(
-                    "content-type"
-                );
-
-
-            if(
-                !contentType ||
-                !contentType.includes(
-                    "application/json"
-                )
-            ){
-
-                const text =
-                    await response.text();
-
-
-                console.error(
-                    "NON JSON RESPONSE:",
-                    text
-                );
-
-
-                setMessage(
-                    `Server returned invalid response (${response.status})`
-                );
-
-
-                return;
-
-            }
-
-
-            const data =
-                await response.json();
-
-
-            console.log(
-                "BULK RESULT:",
-                data
-            );
-
-
-            if(!response.ok){
-
-                setMessage(
-                    data.message ||
-                    "Upload failed"
-                );
-
-                return;
-
-            }
-
-
-            const success =
-                Array.isArray(data.success)
-                    ? data.success
-                    : [];
-
-
-            const failed =
-                Array.isArray(data.failed)
-                    ? data.failed
-                    : [];
-
-
-            setSuccessFiles(
-                success
-            );
-
-
-            setFailedFiles(
-                failed
-            );
-
-
-            setHasResult(true);
-
-
-            if(
-                failed.length === 0
-            ){
-
-                setMessage(
-                    `Upload completed successfully. ${success.length} file(s) uploaded.`
-                );
-
-            }else{
-
-                setMessage(
-                    `Upload completed with ${failed.length} failed file(s).`
-                );
-
-            }
-
-
-            // file input dikosongkan
-            // hasil success/failed TETAP tampil
-            resetFileInput();
-
-
-        }catch(error){
-
-            console.error(
-                "BULK UPLOAD ERROR:",
-                error
-            );
-
-
-            setMessage(
-                "Cannot connect to server"
-            );
-
-
-        }finally{
-
-            setLoading(false);
-
-        }
-
-    };
-
-
-    const zipEnabled =
-        Boolean(
-            eventId &&
-            faculty &&
-            !loadingFaculty
-        );
-
-
-    return(
-
-        <main
-            className="
-            min-h-screen
-            p-8
-            flex
-            justify-center
-            "
-        >
-
-            <div
-                className="
-                w-full
-                max-w-3xl
-                space-y-6
-                "
+      } else {
+        setMessage(`Upload completed with ${failed.length} failed file(s).`);
+      }
+
+      // file input dikosongkan
+      // hasil success/failed TETAP tampil
+      resetFileInput();
+    } catch (error) {
+      console.error("BULK UPLOAD ERROR:", error);
+      setMessage("Cannot connect to server");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const zipEnabled = Boolean(eventId && faculty && !loadingFaculty);
+
+  return (
+    <div className="space-y-7">
+      <PageHeader
+        title="Bulk Photo Upload"
+        subtitle="Upload personal graduation photos by event and faculty."
+      />
+
+      {/* UPLOAD FORM */}
+      <Card className="space-y-6 p-6 md:p-8">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-[13px] bg-brand-soft text-brand">
+            <PackagePlus size={18} />
+          </span>
+          <h2 className="text-lg font-bold">Upload ZIP</h2>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          {/* EVENT */}
+          <div>
+            <Label>Personal Event</Label>
+
+            <Select
+              value={eventId}
+              onChange={(e) => handleEventChange(e.target.value)}
             >
-
-                {/* UPLOAD FORM */}
-
-                <div
-                    className="
-                    glass
-                    rounded-3xl
-                    p-10
-                    "
-                >
-
-                    <h1
-                        className="
-                        text-3xl
-                        font-bold
-                        "
-                    >
-                        Bulk Photo Upload
-                    </h1>
-
-
-                    <p
-                        className="
-                        text-slate-400
-                        mt-2
-                        "
-                    >
-                        Upload personal graduation photos by event and faculty.
-                    </p>
-
-
-                    <div
-                        className="
-                        mt-8
-                        space-y-5
-                        "
-                    >
-
-                        {/* EVENT */}
-
-                        <div>
-
-                            <label
-                                className="
-                                block
-                                text-sm
-                                text-slate-400
-                                mb-2
-                                "
-                            >
-                                Personal Event
-                            </label>
-
-
-                            <select
-                                value={eventId}
-                                onChange={
-                                    handleEventChange
-                                }
-                                className="
-                                w-full
-                                p-4
-                                rounded-xl
-                                bg-black/30
-                                border
-                                border-white/20
-                                "
-                            >
-
-                                <option value="">
-                                    Select Event
-                                </option>
-
-
-                                {
-                                    events.map(
-                                        (item)=>(
-
-                                            <option
-                                                key={item.id}
-                                                value={item.id}
-                                            >
-                                                {item.name}
-                                            </option>
-
-                                        )
-                                    )
-                                }
-
-                            </select>
-
-                        </div>
-
-
-                        {/* FACULTY */}
-
-                        <div>
-
-                            <label
-                                className="
-                                block
-                                text-sm
-                                text-slate-400
-                                mb-2
-                                "
-                            >
-                                Faculty
-                            </label>
-
-
-                            <select
-                                value={faculty}
-                                onChange={
-                                    handleFacultyChange
-                                }
-                                disabled={
-                                    !eventId ||
-                                    loadingFaculty
-                                }
-                                className="
-                                w-full
-                                p-4
-                                rounded-xl
-                                bg-black/30
-                                border
-                                border-white/20
-                                disabled:opacity-50
-                                disabled:cursor-not-allowed
-                                "
-                            >
-
-                                <option value="">
-
-                                    {
-                                        !eventId
-
-                                        ?
-
-                                        "Select Event First"
-
-                                        :
-
-                                        loadingFaculty
-
-                                        ?
-
-                                        "Loading Faculty..."
-
-                                        :
-
-                                        faculties.length === 0
-
-                                        ?
-
-                                        "No Faculty Found"
-
-                                        :
-
-                                        "Select Faculty"
-                                    }
-
-                                </option>
-
-
-                                {
-                                    faculties.map(
-                                        (item)=>(
-
-                                            <option
-                                                key={item}
-                                                value={item}
-                                            >
-                                                {item}
-                                            </option>
-
-                                        )
-                                    )
-                                }
-
-                            </select>
-
-
-                            {
-                                eventId &&
-                                !loadingFaculty &&
-                                faculties.length > 0 &&
-
-                                <p
-                                    className="
-                                    text-xs
-                                    text-slate-500
-                                    mt-2
-                                    "
-                                >
-                                    Faculty loaded from graduate data.
-                                </p>
-                            }
-
-                        </div>
-
-
-                        {/* ZIP SELECTOR */}
-
-                        <label
-                            htmlFor={
-                                zipEnabled
-                                    ? "zip"
-                                    : undefined
-                            }
-                            onClick={(e)=>{
-
-                                if(!zipEnabled){
-
-                                    e.preventDefault();
-
-
-                                    setMessage(
-                                        "Select event and faculty first"
-                                    );
-
-                                }
-
-                            }}
-                            className={`
-                            block
-                            text-center
-                            rounded-xl
-                            border
-                            border-white/20
-                            p-4
-                            transition
-
-                            ${
-                                zipEnabled
-
-                                ?
-
-                                "cursor-pointer bg-white/10 hover:bg-white/20"
-
-                                :
-
-                                "cursor-not-allowed opacity-50 bg-gray-500/20"
-                            }
-                            `}
-                        >
-
-                            {
-                                file
-
-                                ?
-
-                                file.name
-
-                                :
-
-                                zipEnabled
-
-                                ?
-
-                                "Choose ZIP File"
-
-                                :
-
-                                "Select Event & Faculty First"
-                            }
-
-                        </label>
-
-
-                        <input
-                            id="zip"
-                            type="file"
-                            accept=".zip,application/zip"
-                            disabled={!zipEnabled}
-                            className="hidden"
-                            onChange={
-                                handleZipChange
-                            }
-                        />
-
-
-                        {/* FORMAT */}
-
-                        <div
-                            className="
-                            rounded-xl
-                            bg-white/5
-                            border
-                            border-white/10
-                            p-4
-                            "
-                        >
-
-                            <p
-                                className="
-                                text-sm
-                                text-slate-400
-                                "
-                            >
-                                ZIP filename format
-                            </p>
-
-
-                            <div
-                                className="
-                                mt-3
-                                grid
-                                sm:grid-cols-3
-                                gap-2
-                                text-sm
-                                "
-                            >
-
-                                <div
-                                    className="
-                                    bg-black/20
-                                    rounded-lg
-                                    p-3
-                                    "
-                                >
-                                    BEBAS_0001.jpg
-                                </div>
-
-                                <div
-                                    className="
-                                    bg-black/20
-                                    rounded-lg
-                                    p-3
-                                    "
-                                >
-                                    KUNCIR_0001.jpg
-                                </div>
-
-                                <div
-                                    className="
-                                    bg-black/20
-                                    rounded-lg
-                                    p-3
-                                    "
-                                >
-                                    IJAZAH_0001.jpg
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        {/* UPLOAD BUTTON */}
-
-                        <button
-                            onClick={upload}
-                            disabled={
-                                loading ||
-                                !eventId ||
-                                !faculty ||
-                                !file
-                            }
-                            className={`
-                            w-full
-                            py-4
-                            rounded-full
-                            border
-                            border-white/20
-                            transition
-                            font-medium
-
-                            ${
-                                loading ||
-                                !eventId ||
-                                !faculty ||
-                                !file
-
-                                ?
-
-                                "opacity-50 cursor-not-allowed"
-
-                                :
-
-                                "bg-blue-500/20 hover:bg-blue-500/30"
-                            }
-                            `}
-                        >
-
-                            {
-                                loading
-                                    ? "UPLOADING..."
-                                    : "UPLOAD ZIP"
-                            }
-
-                        </button>
-
-
-                        {
-                            message &&
-
-                            <div
-                                className="
-                                rounded-xl
-                                bg-white/5
-                                border
-                                border-white/10
-                                p-4
-                                text-center
-                                text-sm
-                                "
-                            >
-                                {message}
-                            </div>
-                        }
-
-                    </div>
-
-                </div>
-
-
-                {/* RESULT */}
-
-                {
-                    hasResult &&
-
-                    <div
-                        className="
-                        glass
-                        rounded-3xl
-                        p-8
-                        "
-                    >
-
-                        <div
-                            className="
-                            flex
-                            items-center
-                            justify-between
-                            gap-4
-                            flex-wrap
-                            "
-                        >
-
-                            <div>
-
-                                <h2
-                                    className="
-                                    text-2xl
-                                    font-bold
-                                    "
-                                >
-                                    Upload Result
-                                </h2>
-
-                                <p
-                                    className="
-                                    text-slate-400
-                                    text-sm
-                                    mt-1
-                                    "
-                                >
-                                    Review the result before preparing the next ZIP.
-                                </p>
-
-                            </div>
-
-
-                            <button
-                                onClick={
-                                    clearResult
-                                }
-                                className="
-                                px-4
-                                py-2
-                                rounded-full
-                                bg-white/10
-                                border
-                                border-white/20
-                                text-sm
-                                hover:bg-white/20
-                                transition
-                                "
-                            >
-                                Clear Result
-                            </button>
-
-                        </div>
-
-
-                        {/* SUMMARY */}
-
-                        <div
-                            className="
-                            grid
-                            grid-cols-2
-                            gap-4
-                            mt-6
-                            "
-                        >
-
-                            <div
-                                className="
-                                rounded-2xl
-                                border
-                                border-green-400/20
-                                bg-green-500/10
-                                p-5
-                                "
-                            >
-
-                                <p
-                                    className="
-                                    text-sm
-                                    text-green-300
-                                    "
-                                >
-                                    SUCCESS
-                                </p>
-
-                                <p
-                                    className="
-                                    text-3xl
-                                    font-bold
-                                    mt-1
-                                    text-green-300
-                                    "
-                                >
-                                    {successFiles.length}
-                                </p>
-
-                            </div>
-
-
-                            <div
-                                className="
-                                rounded-2xl
-                                border
-                                border-red-400/20
-                                bg-red-500/10
-                                p-5
-                                "
-                            >
-
-                                <p
-                                    className="
-                                    text-sm
-                                    text-red-300
-                                    "
-                                >
-                                    FAILED
-                                </p>
-
-                                <p
-                                    className="
-                                    text-3xl
-                                    font-bold
-                                    mt-1
-                                    text-red-300
-                                    "
-                                >
-                                    {failedFiles.length}
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        {/* FAILED FILES */}
-
-                        {
-                            failedFiles.length > 0 &&
-
-                            <div
-                                className="
-                                mt-8
-                                "
-                            >
-
-                                <div
-                                    className="
-                                    flex
-                                    items-center
-                                    justify-between
-                                    gap-4
-                                    flex-wrap
-                                    "
-                                >
-
-                                    <div>
-
-                                        <h3
-                                            className="
-                                            text-xl
-                                            font-bold
-                                            text-red-300
-                                            "
-                                        >
-                                            Failed Files
-                                        </h3>
-
-                                        <p
-                                            className="
-                                            text-sm
-                                            text-slate-400
-                                            mt-1
-                                            "
-                                        >
-                                            Fix these files and include only them in the next ZIP.
-                                        </p>
-
-                                    </div>
-
-
-                                    <button
-                                        onClick={
-                                            copyFailedFilenames
-                                        }
-                                        className="
-                                        px-5
-                                        py-2
-                                        rounded-full
-                                        bg-red-500/10
-                                        border
-                                        border-red-400/20
-                                        text-red-300
-                                        text-sm
-                                        hover:bg-red-500/20
-                                        transition
-                                        "
-                                    >
-
-                                        {
-                                            copied
-                                                ? "✓ COPIED"
-                                                : "COPY FAILED FILENAMES"
-                                        }
-
-                                    </button>
-
-                                </div>
-
-
-                                <div
-                                    className="
-                                    mt-4
-                                    space-y-3
-                                    max-h-[500px]
-                                    overflow-y-auto
-                                    pr-1
-                                    "
-                                >
-
-                                    {
-                                        failedFiles.map(
-                                            (item,index)=>(
-
-                                                <div
-                                                    key={
-                                                        `${item.file}-${index}`
-                                                    }
-                                                    className="
-                                                    rounded-xl
-                                                    bg-red-500/5
-                                                    border
-                                                    border-red-400/20
-                                                    p-4
-                                                    "
-                                                >
-
-                                                    <div
-                                                        className="
-                                                        flex
-                                                        gap-3
-                                                        "
-                                                    >
-
-                                                        <div
-                                                            className="
-                                                            flex
-                                                            items-center
-                                                            justify-center
-                                                            w-7
-                                                            h-7
-                                                            shrink-0
-                                                            rounded-full
-                                                            bg-red-500/20
-                                                            text-red-300
-                                                            text-xs
-                                                            "
-                                                        >
-                                                            {index + 1}
-                                                        </div>
-
-
-                                                        <div
-                                                            className="
-                                                            min-w-0
-                                                            "
-                                                        >
-
-                                                            <p
-                                                                className="
-                                                                font-medium
-                                                                text-white
-                                                                break-all
-                                                                "
-                                                            >
-                                                                {item.file}
-                                                            </p>
-
-                                                            <p
-                                                                className="
-                                                                text-sm
-                                                                text-red-300
-                                                                mt-1
-                                                                "
-                                                            >
-                                                                {item.reason}
-                                                            </p>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                </div>
-
-                                            )
-                                        )
-                                    }
-
-                                </div>
-
-                            </div>
-                        }
-
-
-                        {/* ALL SUCCESS */}
-
-                        {
-                            failedFiles.length === 0 &&
-                            successFiles.length > 0 &&
-
-                            <div
-                                className="
-                                mt-8
-                                rounded-2xl
-                                bg-green-500/10
-                                border
-                                border-green-400/20
-                                p-6
-                                text-center
-                                "
-                            >
-
-                                <div
-                                    className="
-                                    text-3xl
-                                    "
-                                >
-                                    ✓
-                                </div>
-
-                                <h3
-                                    className="
-                                    text-xl
-                                    font-bold
-                                    text-green-300
-                                    mt-2
-                                    "
-                                >
-                                    All Files Uploaded
-                                </h3>
-
-                                <p
-                                    className="
-                                    text-slate-400
-                                    text-sm
-                                    mt-2
-                                    "
-                                >
-                                    No failed files need to be re-uploaded.
-                                </p>
-
-                            </div>
-                        }
-
-
-                        {/* SECOND CHANCE INFO */}
-
-                        {
-                            failedFiles.length > 0 &&
-
-                            <div
-                                className="
-                                mt-6
-                                rounded-xl
-                                bg-blue-500/10
-                                border
-                                border-blue-400/20
-                                p-5
-                                "
-                            >
-
-                                <p
-                                    className="
-                                    font-medium
-                                    text-blue-300
-                                    "
-                                >
-                                    Second Chance Upload
-                                </p>
-
-                                <p
-                                    className="
-                                    text-sm
-                                    text-slate-300
-                                    mt-2
-                                    leading-relaxed
-                                    "
-                                >
-                                    Perbaiki file yang gagal, buat ZIP baru yang hanya berisi file tersebut, lalu upload kembali dengan Event dan Faculty yang sama. File yang sudah berhasil tidak perlu dimasukkan lagi.
-                                </p>
-
-                            </div>
-                        }
-
-                    </div>
-                }
-
+              <option value="">Select Event</option>
+
+              {events.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          {/* FACULTY */}
+          <div>
+            <Label>Faculty</Label>
+
+            <Select
+              value={faculty}
+              onChange={(e) => handleFacultyChange(e.target.value)}
+              disabled={!eventId || loadingFaculty}
+            >
+              <option value="">
+                {!eventId
+                  ? "Select Event First"
+                  : loadingFaculty
+                  ? "Loading Faculty..."
+                  : faculties.length === 0
+                  ? "No Faculty Found"
+                  : "Select Faculty"}
+              </option>
+
+              {faculties.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </Select>
+
+            {eventId && !loadingFaculty && faculties.length > 0 && (
+              <p className="mt-2 text-xs text-low">
+                Faculty loaded from graduate data.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* ZIP SELECTOR */}
+        <div>
+          <Label>ZIP File</Label>
+
+          <input
+            ref={zipInputRef}
+            id="zip"
+            type="file"
+            accept=".zip,application/zip"
+            disabled={!zipEnabled}
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) handleZipChange(e.target.files);
+            }}
+          />
+
+          <label
+            htmlFor={zipEnabled ? "zip" : undefined}
+            onClick={(e) => {
+              if (!zipEnabled) {
+                e.preventDefault();
+                setMessage("Select event and faculty first");
+              }
+            }}
+            className={`
+              flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[18px]
+              border border-dashed p-8 text-center transition
+              ${
+                zipEnabled
+                  ? "border-line bg-card-2 hover:border-brand/50 hover:bg-field"
+                  : "cursor-not-allowed border-line bg-card-2 opacity-50"
+              }
+            `}
+          >
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 text-accent">
+              <Upload size={22} />
+            </span>
+
+            <span className="text-sm font-semibold text-hi">
+              {file
+                ? file.name
+                : zipEnabled
+                ? "Choose ZIP File"
+                : "Select Event & Faculty First"}
+            </span>
+          </label>
+        </div>
+
+        {/* FORMAT INFO */}
+        <div className="rounded-[18px] border border-line-soft bg-card-2 p-5">
+          <p className="text-sm text-low">ZIP filename format</p>
+
+          <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+            <div className="rounded-[13px] bg-field p-3 font-mono text-[13px] text-mid">
+              BEBAS_0001.jpg
+            </div>
+            <div className="rounded-[13px] bg-field p-3 font-mono text-[13px] text-mid">
+              KUNCIR_0001.jpg
+            </div>
+            <div className="rounded-[13px] bg-field p-3 font-mono text-[13px] text-mid">
+              IJAZAH_0001.jpg
+            </div>
+          </div>
+        </div>
+
+        <Button
+          onClick={upload}
+          disabled={loading || !eventId || !faculty || !file}
+          fullWidth
+          size="lg"
+        >
+          <Upload size={16} />
+          {loading ? "UPLOADING..." : "UPLOAD ZIP"}
+        </Button>
+
+        {message && (
+          <Alert
+            tone={
+              hasResult
+                ? failedFiles.length > 0
+                  ? "warning"
+                  : "success"
+                : "info"
+            }
+          >
+            {message}
+          </Alert>
+        )}
+      </Card>
+
+      {/* RESULT */}
+      {hasResult && (
+        <Card className="space-y-6 p-6 md:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold">Upload Result</h2>
+
+              <p className="mt-1 text-sm text-low">
+                Review the result before preparing the next ZIP.
+              </p>
             </div>
 
-        </main>
+            <Button variant="secondary" size="sm" onClick={clearResult}>
+              <RotateCcw size={14} />
+              Clear Result
+            </Button>
+          </div>
 
-    );
+          {/* SUMMARY */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+            <div className="rounded-[18px] border border-success/25 bg-success/10 p-5">
+              <p className="flex items-center gap-2 text-sm text-success">
+                <CheckCircle2 size={15} />
+                SUCCESS
+              </p>
 
+              <p className="mt-1 text-3xl font-extrabold text-success">
+                {successFiles.length}
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-danger/25 bg-danger/10 p-5">
+              <p className="flex items-center gap-2 text-sm text-danger">
+                <XCircle size={15} />
+                FAILED
+              </p>
+
+              <p className="mt-1 text-3xl font-extrabold text-danger">
+                {failedFiles.length}
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-line bg-white/5 p-5">
+              <p className="flex items-center gap-2 text-sm text-mid">
+                <SkipForward size={15} />
+                SKIPPED
+              </p>
+
+              <p className="mt-1 text-3xl font-extrabold text-mid">
+                {skippedFiles.length}
+              </p>
+            </div>
+          </div>
+
+          {/* SKIPPED FILES */}
+          {skippedFiles.length > 0 && (
+            <div>
+              <h3 className="text-base font-bold">Skipped Files</h3>
+
+              <p className="mt-1 text-sm text-low">
+                These were not uploaded because the photo already exists or was
+                duplicated inside the ZIP.
+              </p>
+
+              <div className="mt-4 max-h-[300px] space-y-3 overflow-y-auto pr-1">
+                {skippedFiles.map((item, index) => (
+                  <div
+                    key={`${item.file}-${index}`}
+                    className="rounded-[13px] border border-line-soft bg-white/5 p-4"
+                  >
+                    <p className="truncate text-sm font-semibold text-hi">
+                      {item.file}
+                    </p>
+
+                    <p className="mt-1 text-sm text-low">{item.reason}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* FAILED FILES */}
+          {failedFiles.length > 0 && (
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-bold text-danger">
+                    Failed Files
+                  </h3>
+
+                  <p className="mt-1 text-sm text-low">
+                    Fix these files and include only them in the next ZIP.
+                  </p>
+                </div>
+
+                <Button variant="danger" size="sm" onClick={copyFailedFilenames}>
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                  {copied ? "COPIED" : "COPY FAILED FILENAMES"}
+                </Button>
+              </div>
+
+              <div className="mt-4 max-h-[500px] space-y-3 overflow-y-auto pr-1">
+                {failedFiles.map((item, index) => (
+                  <div
+                    key={`${item.file}-${index}`}
+                    className="rounded-[13px] border border-danger/25 bg-danger/5 p-4"
+                  >
+                    <div className="flex gap-3">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-danger/20 text-xs text-danger">
+                        {index + 1}
+                      </div>
+
+                      <div className="min-w-0">
+                        <p className="break-all font-medium text-hi">
+                          {item.file}
+                        </p>
+
+                        <p className="mt-1 text-sm text-danger">
+                          {item.reason}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ALL SUCCESS */}
+          {failedFiles.length === 0 && successFiles.length > 0 && (
+            <div className="rounded-[18px] border border-success/25 bg-success/10 p-6 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-success/20 text-success">
+                <CheckCircle2 size={24} />
+              </div>
+
+              <h3 className="text-base font-bold text-success">
+                All Files Uploaded
+              </h3>
+
+              <p className="mt-1.5 text-sm text-low">
+                No failed files need to be re-uploaded.
+              </p>
+            </div>
+          )}
+
+          {/* SECOND CHANCE INFO */}
+          {failedFiles.length > 0 && (
+            <div className="rounded-[18px] border border-brand/25 bg-brand-soft p-5">
+              <p className="flex items-center gap-2 font-medium text-brand">
+                <Info size={16} />
+                Second Chance Upload
+              </p>
+
+              <p className="mt-2 text-sm leading-relaxed text-mid">
+                Perbaiki file yang gagal, buat ZIP baru yang hanya berisi file
+                tersebut, lalu upload kembali dengan Event dan Faculty yang
+                sama. File yang sudah berhasil tidak perlu dimasukkan lagi.
+              </p>
+            </div>
+          )}
+        </Card>
+      )}
+    </div>
+  );
 }
