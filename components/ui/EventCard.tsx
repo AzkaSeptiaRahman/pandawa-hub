@@ -28,7 +28,7 @@ export default function EventCard({
       <div className="relative h-52 overflow-hidden bg-card-2">
         {event.thumbnail ? (
           <img
-            src={`${apiUrl}${event.thumbnail}`}
+            src={`${event.thumbnail}`}
             alt={event.name || "Event"}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />

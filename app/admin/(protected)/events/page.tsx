@@ -49,6 +49,11 @@ export default function EventsPage() {
     description: "",
   });
 
+  const [editThumbnail, setEditThumbnail] = useState<File | null>(null);
+  const [editPreview, setEditPreview] = useState<string>("");
+  const [editThumbKey, setEditThumbKey] = useState(0);
+  const [editCurrentThumb, setEditCurrentThumb] = useState<string | null>(null);
+
   const [form, setForm] = useState({
     name: "",
     slug: "",
@@ -190,6 +195,27 @@ export default function EventsPage() {
       status: event.status || "active",
       description: event.description || "",
     });
+
+    setEditThumbnail(null);
+    setEditPreview("");
+    setEditCurrentThumb(event.thumbnail || null);
+  };
+
+  const handleEditThumbnail = (files: FileList) => {
+    const file = files?.[0];
+
+    if (!file) return;
+
+    setEditThumbnail(file);
+    setEditPreview(URL.createObjectURL(file));
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditThumbnail(null);
+    setEditPreview("");
+    setEditCurrentThumb(null);
+    setEditThumbKey((k) => k + 1);
   };
 
   const updateEditField = (field: string, value: string) => {
@@ -212,6 +238,10 @@ export default function EventsPage() {
       form.append("status", editForm.status);
       form.append("description", editForm.description);
 
+      if (editThumbnail) {
+        form.append("thumbnail", editThumbnail);
+      }
+
       const res = await fetch(`${API}/api/admin/events/${editingId}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
@@ -226,7 +256,7 @@ export default function EventsPage() {
       }
 
       setMessage("Event updated");
-      setEditingId(null);
+      cancelEdit();
       loadEvents();
     } catch (error) {
       console.error(error);
@@ -436,6 +466,39 @@ export default function EventsPage() {
                       />
                     </div>
 
+                    <div>
+                      <Label>Thumbnail</Label>
+
+                      <FileDropzone
+                        key={editThumbKey}
+                        id={`edit-thumbnail-${event.id}`}
+                        accept="image/*"
+                        fileName={editThumbnail?.name}
+                        fileSize={
+                          editThumbnail
+                            ? `${(editThumbnail.size / 1024).toFixed(1)} KB`
+                            : undefined
+                        }
+                        placeholder="Change Thumbnail"
+                        hint="PNG or JPG, recommended 16:9"
+                        onSelect={handleEditThumbnail}
+                      />
+
+                      {(editPreview || editCurrentThumb) && (
+                        <img
+                          src={editPreview || mediaUrl(editCurrentThumb)}
+                          alt="thumbnail preview"
+                          className="mt-3 h-40 w-full rounded-[18px] border border-line-soft object-cover"
+                        />
+                      )}
+
+                      {editThumbnail && (
+                        <p className="mt-2 text-xs text-low">
+                          The old thumbnail will be deleted after saving.
+                        </p>
+                      )}
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label>Type</Label>
@@ -465,7 +528,7 @@ export default function EventsPage() {
                         <Save size={14} />
                         Save
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>
+                      <Button size="sm" variant="ghost" onClick={cancelEdit}>
                         <X size={14} />
                         Cancel
                       </Button>

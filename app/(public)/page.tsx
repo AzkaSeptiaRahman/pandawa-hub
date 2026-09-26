@@ -26,7 +26,9 @@ export default function Home() {
           </div>
 
           <h1 className="text-6xl font-extrabold leading-[0.95] tracking-tight md:text-7xl">
-            PANDAWA<span className="text-brand">HUB</span>
+            PANDAWA
+            <br />
+            <span className="text-brand">HUB</span>
           </h1>
 
           <p className="mt-7 max-w-full text-base leading-relaxed text-mid md:text-lg">

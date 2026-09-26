@@ -19,6 +19,7 @@ import Label from "@/components/ui/Label";
 import Card from "@/components/ui/Card";
 import PageHeader from "@/components/ui/PageHeader";
 import Alert from "@/components/ui/Alert";
+import { useBulkUpload } from "@/components/admin/BulkUploadProvider";
 
 type Event = {
   id: number;
@@ -59,8 +60,10 @@ export default function BulkUpload() {
   const [file, setFile] = useState<File | null>(null);
 
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
   const [loadingFaculty, setLoadingFaculty] = useState(false);
+
+  const { state: bulk, isActive, startUpload } = useBulkUpload();
+  const loading = isActive;
 
   const [failedFiles, setFailedFiles] = useState<FailedFile[]>([]);
   const [skippedFiles, setSkippedFiles] = useState<FailedFile[]>([]);
@@ -77,6 +80,51 @@ export default function BulkUpload() {
   useEffect(() => {
     loadEvents();
   }, []);
+
+  // Sinkronkan hasil dari provider (upload tetap berjalan
+  // walau pengguna sempat pindah halaman admin).
+  useEffect(() => {
+    if (bulk.status === "success") {
+      const success = bulk.result?.success || [];
+      const failed = (bulk.result?.failed || []).map((item) => ({
+        file: item.file,
+        reason: item.reason || "Unknown error",
+      }));
+      const skipped = (bulk.result?.skipped || []).map((item) => ({
+        file: item.file,
+        reason: item.reason || "Skipped",
+      }));
+
+      setSuccessFiles(success);
+      setFailedFiles(failed);
+      setSkippedFiles(skipped);
+      setHasResult(true);
+      setCopied(false);
+
+      setMessage(
+        failed.length === 0
+          ? `Upload completed successfully. ${success.length} file(s) uploaded.`
+          : `Upload completed with ${failed.length} failed file(s).`,
+      );
+
+      setFile(null);
+
+      if (zipInputRef.current) {
+        zipInputRef.current.value = "";
+      }
+    }
+
+    if (bulk.status === "error") {
+      setHasResult(false);
+      setMessage(bulk.error || "Upload failed");
+
+      setFile(null);
+
+      if (zipInputRef.current) {
+        zipInputRef.current.value = "";
+      }
+    }
+  }, [bulk.status, bulk.result, bulk.error]);
 
   const loadEvents = async () => {
     try {
@@ -128,7 +176,7 @@ export default function BulkUpload() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       const contentType = response.headers.get("content-type");
@@ -177,8 +225,8 @@ export default function BulkUpload() {
     new Set(
       graduates
         .map((item) => item.faculty?.trim())
-        .filter((item): item is string => Boolean(item))
-    )
+        .filter((item): item is string => Boolean(item)),
+    ),
   ).sort();
 
   // =====================================================
@@ -198,6 +246,8 @@ export default function BulkUpload() {
   // =====================================================
 
   const handleEventChange = (selectedId: string) => {
+    if (isActive) return;
+
     setEventId(selectedId);
     setFaculty("");
     setGraduates([]);
@@ -221,6 +271,8 @@ export default function BulkUpload() {
   // =====================================================
 
   const handleFacultyChange = (value: string) => {
+    if (isActive) return;
+
     setFaculty(value);
 
     resetFileInput();
@@ -238,6 +290,19 @@ export default function BulkUpload() {
   // =====================================================
 
   const handleZipChange = (files: FileList) => {
+    // Penjagaan: tidak boleh memilih ZIP lain saat upload berjalan.
+    if (isActive) {
+      setMessage(
+        "An upload is already in progress. Please wait until it finishes.",
+      );
+
+      if (zipInputRef.current) {
+        zipInputRef.current.value = "";
+      }
+
+      return;
+    }
+
     const selected = files?.[0];
 
     if (!selected) {
@@ -302,9 +367,16 @@ export default function BulkUpload() {
   // UPLOAD
   // =====================================================
 
-  const upload = async () => {
+  const upload = () => {
     setMessage("");
     setCopied(false);
+
+    if (isActive) {
+      setMessage(
+        "An upload is already in progress. Please wait until it finishes.",
+      );
+      return;
+    }
 
     if (!eventId) {
       setMessage("Please select event first");
@@ -321,80 +393,20 @@ export default function BulkUpload() {
       return;
     }
 
-    try {
-      setLoading(true);
-      setHasResult(false);
-      setFailedFiles([]);
-      setSkippedFiles([]);
-      setSuccessFiles([]);
+    setHasResult(false);
+    setFailedFiles([]);
+    setSkippedFiles([]);
+    setSuccessFiles([]);
 
-      const form = new FormData();
-
-      form.append("event_id", eventId);
-      form.append("faculty", faculty);
-      form.append("file", file);
-
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(`${API}/api/admin/photos/bulk-upload`, {
-        method: "POST",
-
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-
-        body: form,
-      });
-
-      const contentType = response.headers.get("content-type");
-
-      if (!contentType || !contentType.includes("application/json")) {
-        const text = await response.text();
-
-        console.error("NON JSON RESPONSE:", text);
-
-        setMessage(`Server returned invalid response (${response.status})`);
-        return;
-      }
-
-      const data = await response.json();
-
-      console.log("BULK RESULT:", data);
-
-      if (!response.ok) {
-        setMessage(data.message || "Upload failed");
-        return;
-      }
-
-      const success = Array.isArray(data.success) ? data.success : [];
-      const failed = Array.isArray(data.failed) ? data.failed : [];
-      const skipped = Array.isArray(data.skipped) ? data.skipped : [];
-
-      setSuccessFiles(success);
-      setFailedFiles(failed);
-      setSkippedFiles(skipped);
-      setHasResult(true);
-
-      if (failed.length === 0) {
-        setMessage(
-          `Upload completed successfully. ${success.length} file(s) uploaded.`
-        );
-      } else {
-        setMessage(`Upload completed with ${failed.length} failed file(s).`);
-      }
-
-      // file input dikosongkan
-      // hasil success/failed TETAP tampil
-      resetFileInput();
-    } catch (error) {
-      console.error("BULK UPLOAD ERROR:", error);
-      setMessage("Cannot connect to server");
-    } finally {
-      setLoading(false);
-    }
+    // Upload dijalankan oleh provider di layout admin, sehingga tetap
+    // berjalan dan progress-nya tetap terlihat saat pindah halaman.
+    startUpload({ file, eventId, faculty });
   };
 
-  const zipEnabled = Boolean(eventId && faculty && !loadingFaculty);
+  const zipEnabled =
+    Boolean(eventId && faculty && !loadingFaculty) && !isActive;
+
+  const formLocked = isActive;
 
   return (
     <div className="space-y-7">
@@ -419,6 +431,7 @@ export default function BulkUpload() {
 
             <Select
               value={eventId}
+              disabled={formLocked}
               onChange={(e) => handleEventChange(e.target.value)}
             >
               <option value="">Select Event</option>
@@ -438,16 +451,16 @@ export default function BulkUpload() {
             <Select
               value={faculty}
               onChange={(e) => handleFacultyChange(e.target.value)}
-              disabled={!eventId || loadingFaculty}
+              disabled={!eventId || loadingFaculty || formLocked}
             >
               <option value="">
                 {!eventId
                   ? "Select Event First"
                   : loadingFaculty
-                  ? "Loading Faculty..."
-                  : faculties.length === 0
-                  ? "No Faculty Found"
-                  : "Select Faculty"}
+                    ? "Loading Faculty..."
+                    : faculties.length === 0
+                      ? "No Faculty Found"
+                      : "Select Faculty"}
               </option>
 
               {faculties.map((item) => (
@@ -507,8 +520,8 @@ export default function BulkUpload() {
               {file
                 ? file.name
                 : zipEnabled
-                ? "Choose ZIP File"
-                : "Select Event & Faculty First"}
+                  ? "Choose ZIP File"
+                  : "Select Event & Faculty First"}
             </span>
           </label>
         </div>
@@ -529,6 +542,14 @@ export default function BulkUpload() {
             </div>
           </div>
         </div>
+
+        {formLocked && (
+          <Alert tone="warning">
+            Upload sedang berjalan. Jangan tutup tab, refresh, logout, atau
+            mematikan koneksi. Anda tetap boleh berpindah halaman di menu admin
+            — progress akan terus berjalan.
+          </Alert>
+        )}
 
         <Button
           onClick={upload}
@@ -650,7 +671,11 @@ export default function BulkUpload() {
                   </p>
                 </div>
 
-                <Button variant="danger" size="sm" onClick={copyFailedFilenames}>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={copyFailedFilenames}
+                >
                   {copied ? <Check size={14} /> : <Copy size={14} />}
                   {copied ? "COPIED" : "COPY FAILED FILENAMES"}
                 </Button>
