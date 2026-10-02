@@ -11,6 +11,7 @@ import {
   GraduationCap,
   ImagePlus,
   PackagePlus,
+  Trash2,
   UsersRound,
   LogOut,
   PanelLeftClose,
@@ -26,6 +27,7 @@ const menus = [
   { name: "Graduates", path: "/admin/graduates", icon: GraduationCap },
   { name: "Upload Photo", path: "/admin/photos", icon: ImagePlus },
   { name: "Bulk Upload", path: "/admin/photos/bulk", icon: PackagePlus },
+  { name: "Delete Photos", path: "/admin/photos/purge", icon: Trash2 },
   { name: "Users", path: "/admin/users", icon: UsersRound },
 ];
 
